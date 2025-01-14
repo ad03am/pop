@@ -5,5 +5,8 @@ Implementacja algorytmu ewolucja różnicowej z modyfikacją wdrażającą model
 ## Instalacja
 
 ```bash
+python.exe -m venv venv
+source venv/bin/actvate
 pip install -r requirements.txt
 ```
+
