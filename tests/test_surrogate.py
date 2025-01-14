@@ -1,10 +1,10 @@
 import numpy as np
-from src.surrogate_model import SurrogateModel
+from src.surrogate_model import surrogate_model
 from src.functions import rastrigin
 
 
 def test_surrogate_model():
-    surrogate = SurrogateModel()
+    surrogate = surrogate_model()
 
     for _ in range(10):
         x = np.random.uniform(-5.12, 5.12, 10)
@@ -18,5 +18,5 @@ def test_surrogate_model():
     assert pred is not None
     assert isinstance(pred, np.ndarray)
 
-    surrogate_small = SurrogateModel(min_samples=10)
+    surrogate_small = surrogate_model(min_samples=10)
     assert surrogate_small.predict(x_test) is None

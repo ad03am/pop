@@ -2,7 +2,7 @@ from sklearn.tree import DecisionTreeRegressor
 import numpy as np
 
 
-class SurrogateModel:
+class surrogate_model:
     def __init__(self, min_samples=10):
         self.model = DecisionTreeRegressor()
         self.min_samples = min_samples

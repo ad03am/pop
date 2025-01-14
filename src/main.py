@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class DifferentialEvolution:
+class differential_evolution:
     def __init__(self, func, bounds, population_size=50, max_generations=100, F=0.8, CR=0.7):
         self.func = func
         self.bounds = np.array(bounds)
