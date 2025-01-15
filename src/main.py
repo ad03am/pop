@@ -10,8 +10,10 @@ class differential_evolution:
         self.max_generations = max_generations
         self.F = F
         self.CR = CR
+        self.evaluations = 0
 
     def evaluate(self, x: np.ndarray):
+        self.evaluations += 1
         return self.func(x)
 
     def initialize_population(self):
