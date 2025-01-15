@@ -1,0 +1,35 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{polski}
+\usepackage[polish]{babel}
+
+\begin{document}
+
+\title{POP - projekt}
+\author{Adam Czupryński \and Szymon Makuch}
+\maketitle
+
+\section{Temat}
+Ewolucja różnicowa z modyfikacją wdrażającą (nieszablonowy) model zastępczy (surrogate model) w celu wyboru osobników z populacji do określenia ich jakości za pomocą funkcji celu.
+
+\section{Interpretacja tematu}
+Zadanie polega na implementacji modelu zastępczego w algorytmie ewolucji różnicowej, służącego do oszczędnej selekcji osobników do ewaluacji. Głównym celem jest ograniczenie liczby kosztownych obliczeniowo ewaluacji funkcji celu przy zachowaniu efektywności algorytmu.
+
+\section{Propozycja rozwiązania}
+W celu ograniczenia kosztów obliczeniowych związanych z ewaluacją wszystkich osobników w populacji użyjemy algorytmu ID3 jako modelu zastępczego, uczonego na podstawie historycznych ewaluacji. ID3 umożliwia tworzenie drzew decyzyjnych, na podstawie których łatwo będzie wybrać najlepszych osobników do ewaluacji.
+
+\section{Implementacja i środowisko}
+Projekt zostanie zaimplementowany w języku Python z wykorzystaniem bibliotek:
+\begin{itemize}
+    \item scipy - implementacja algorytmu ewolucji różnicowej
+    \item scikit-learn - testy i metryki
+    \item matplotlib, seaborn i pandas - wizualizacja wyników
+\end{itemize}
+
+\section{Założenia}
+Algorytm ewolucji różnicowej zostanie zaczerpnięty z biblioteki scipy. Wyniki testów zostaną przedstawione na wykresach.
+
+\section{Badanie jakości}
+Algorytm testowany będzie na standardowych funkcjach testowych (np. Rastrigin, Rosenbrock), dla każdej z funkcji zastosowana zostanie k-krotna walidacja krzyżowa. Badania jakości obejmować będą testy liczby wywołań funkcji celu, jakości znalezionych rozwiązań czy czasu działania.
+
+\end{document}
