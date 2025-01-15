@@ -3,3 +3,4 @@
 venv/
 __pycache__/
 .flake8
+src/results*
