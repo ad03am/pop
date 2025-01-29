@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from itertools import product
-from main import differential_evolution
+from differential_evolution import differential_evolution
 from cec_functions import CECFunctions, generate_rotation_matrix, generate_shift_vector
 
 

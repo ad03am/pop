@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from main import differential_evolution
+from differential_evolution import differential_evolution
 from surrogate_de import surrogate_de
 from functions import rastrigin
 

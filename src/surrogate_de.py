@@ -1,4 +1,4 @@
-from main import differential_evolution
+from differential_evolution import differential_evolution
 import numpy as np
 from surrogate_model import surrogate_model
 

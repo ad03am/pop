@@ -1,4 +1,4 @@
-from src.main import differential_evolution
+from src.differential_evolution import differential_evolution
 from src.functions import rastrigin, rosenbrock
 
 
