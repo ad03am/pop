@@ -34,18 +34,23 @@ class DecisionTreeRegressor:
 
         for feature in range(n):
             thresholds = np.unique(X[:, feature])
-            
+
             for threshold in thresholds:
                 left_mask = X[:, feature] <= threshold
                 right_mask = ~left_mask
-                
-                if np.sum(left_mask) < self.min_samples_leaf or np.sum(right_mask) < self.min_samples_leaf:
+
+                if (
+                    np.sum(left_mask) < self.min_samples_leaf
+                    or np.sum(right_mask) < self.min_samples_leaf
+                ):
                     continue
-                
+
                 left_mse = self._calculate_mse(y[left_mask])
                 right_mse = self._calculate_mse(y[right_mask])
-                current_mse = (np.sum(left_mask) * left_mse + np.sum(right_mask) * right_mse) / m
-                
+                current_mse = (
+                    np.sum(left_mask) * left_mse + np.sum(right_mask) * right_mse
+                ) / m
+
                 if current_mse < best_mse:
                     best_mse = current_mse
                     best_feature = feature
@@ -55,14 +60,18 @@ class DecisionTreeRegressor:
 
     def _build_tree(self, X, y, depth=0):
         node = Node()
-        
-        if depth >= self.max_depth or len(np.unique(y)) == 1 or len(y) <= self.min_samples_split:
+
+        if (
+            depth >= self.max_depth
+            or len(np.unique(y)) == 1
+            or len(y) <= self.min_samples_split
+        ):
             node.is_leaf = True
             node.value = np.mean(y)
             return node
 
         feature, threshold, mse = self._find_best_split(X, y)
-        
+
         if feature is None:
             node.is_leaf = True
             node.value = np.mean(y)
@@ -96,6 +105,6 @@ class DecisionTreeRegressor:
     def predict(self, X):
         if len(X.shape) == 1:
             X = X.reshape(1, -1)
-        
+
         predictions = np.array([self._predict_single(x, self.root) for x in X])
         return predictions

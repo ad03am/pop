@@ -30,22 +30,24 @@ for i in range(n_runs):
 
 print("Plotting...")
 plt.figure(figsize=(6, 5))
-plt.boxplot([standard_results, surrogate_results], labels=['Standard DE', 'Surrogate DE'])
-plt.title('Objective Function Value')
-plt.ylabel('Fitness')
+plt.boxplot(
+    [standard_results, surrogate_results], labels=["Standard DE", "Surrogate DE"]
+)
+plt.title("Objective Function Value")
+plt.ylabel("Fitness")
 plt.tight_layout()
-plt.savefig('results_fitness.png')
+plt.savefig("results_fitness.png")
 plt.close()
 
 plt.figure(figsize=(6, 5))
 means = [np.mean(standard_evals), np.mean(surrogate_evals)]
 std_devs = [np.std(standard_evals), np.std(surrogate_evals)]
 
-plt.bar(['Standard DE', 'Surrogate DE'], means, yerr=std_devs, capsize=5)
-plt.title('Average Number of Evaluations')
-plt.ylabel('Number of Evaluations')
+plt.bar(["Standard DE", "Surrogate DE"], means, yerr=std_devs, capsize=5)
+plt.title("Average Number of Evaluations")
+plt.ylabel("Number of Evaluations")
 plt.tight_layout()
-plt.savefig('results_evaluations.png')
+plt.savefig("results_evaluations.png")
 plt.close()
 
 print("\nAverage results:")
