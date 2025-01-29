@@ -68,15 +68,12 @@ class differential_evolution:
     @staticmethod
     def statistical_test(results1, results2, alpha=0.05):
         """Perform statistical significance test between two sets of results"""
-        # Shapiro-Wilk test for normality
         _, p1 = stats.shapiro(results1)
         _, p2 = stats.shapiro(results2)
 
-        if p1 > alpha and p2 > alpha:  # If both are normally distributed
-            # Use t-test
+        if p1 > alpha and p2 > alpha:
             _, p_value = stats.ttest_ind(results1, results2)
         else:
-            # Use Mann-Whitney U test
             _, p_value = stats.mannwhitneyu(results1, results2, alternative="two-sided")
 
         return p_value

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from differential_evolution import differential_evolution
 from surrogate_de import surrogate_de
-from cec_functions import CECFunctions, generate_rotation_matrix, generate_shift_vector
+from functions import CECFunctions, generate_rotation_matrix, generate_shift_vector
 
 
 def run_experiments():

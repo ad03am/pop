@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from itertools import product
 from differential_evolution import differential_evolution
-from cec_functions import CECFunctions, generate_rotation_matrix, generate_shift_vector
+from functions import CECFunctions, generate_rotation_matrix, generate_shift_vector
 
 
 def parameter_tuning_experiment():
