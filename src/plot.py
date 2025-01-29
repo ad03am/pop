@@ -12,6 +12,7 @@ print("Testing Standard DE...")
 standard_results = []
 standard_evals = []
 for i in range(n_runs):
+    print(f"Run {i + 1}/{n_runs}")
     de = differential_evolution(rastrigin, bounds)
     _, fitness = de.optimize()
     standard_results.append(fitness)
@@ -21,11 +22,13 @@ print("Testing Surrogate DE...")
 surrogate_results = []
 surrogate_evals = []
 for i in range(n_runs):
+    print(f"Run {i + 1}/{n_runs}")
     de = surrogate_de(rastrigin, bounds)
     _, fitness = de.optimize()
     surrogate_results.append(fitness)
     surrogate_evals.append(de.evaluations)
 
+print("Plotting...")
 plt.figure(figsize=(6, 5))
 plt.boxplot([standard_results, surrogate_results], labels=['Standard DE', 'Surrogate DE'])
 plt.title('Objective Function Value')

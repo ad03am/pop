@@ -1,10 +1,11 @@
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.tree import DecisionTreeRegressor as SDecisionTreeRegressor
+from custom_tree import DecisionTreeRegressor as CDecisionTreeRegressor
 import numpy as np
 
 
 class surrogate_model:
     def __init__(self, min_samples=10):
-        self.model = DecisionTreeRegressor()
+        self.model = CDecisionTreeRegressor()
         self.min_samples = min_samples
         self.history_X = []
         self.history_y = []
