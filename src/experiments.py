@@ -8,7 +8,7 @@ from functions import CECFunctions, generate_rotation_matrix, generate_shift_vec
 def run_experiments():
     dim = 10
     bounds = [(-100, 100)] * dim
-    n_runs = 3
+    n_runs = 20
 
     shift = generate_shift_vector(dim, bounds)
     rotation = generate_rotation_matrix(dim)
