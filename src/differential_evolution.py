@@ -4,7 +4,14 @@ from scipy import stats
 
 class differential_evolution:
     def __init__(
-        self, func, bounds, population_size=50, max_generations=100, F=0.8, CR=0.7
+        self,
+        func,
+        bounds,
+        population_size=50,
+        max_generations=100,
+        F=0.8,
+        CR=0.7,
+        stagnation_generations=20,
     ):
         self.func = func
         self.bounds = np.array(bounds)
@@ -14,6 +21,7 @@ class differential_evolution:
         self.F = F
         self.CR = CR
         self.evaluations = 0
+        self.stagnation_generations = stagnation_generations
         self.convergence_history = []
         self.best_history = []
 
@@ -38,6 +46,8 @@ class differential_evolution:
         best_solution = population[best_idx].copy()
         best_fitness = fitness[best_idx]
         self.best_history = [best_fitness]
+        no_improvement_count = 0
+        last_best_fitness = best_fitness
 
         for generation in range(self.max_generations):
             for i in range(self.population_size):
@@ -59,9 +69,23 @@ class differential_evolution:
                     if trial_fitness < best_fitness:
                         best_solution = trial.copy()
                         best_fitness = trial_fitness
+                        no_improvement_count = 0
+
+            if best_fitness >= last_best_fitness:
+                no_improvement_count += 1
+            else:
+                last_best_fitness = best_fitness
+                no_improvement_count = 0
 
             self.convergence_history.append(np.mean(fitness))
             self.best_history.append(best_fitness)
+
+            if no_improvement_count >= self.stagnation_generations:
+                print(
+                    f"Zatrzymano z powodu stagnacji przez {self.stagnation_generations} generacji"
+                )
+                print(f"Generacja: {generation + 1}/{self.max_generations}")
+                break
 
         return best_solution, best_fitness
 
