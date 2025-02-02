@@ -4,8 +4,8 @@ from surrogate_model import surrogate_model
 
 
 class surrogate_de(differential_evolution):
-    def __init__(self, func, bounds):
-        super().__init__(func, bounds)
+    def __init__(self, func, bounds, population_size=50, max_generations=100, F=0.8, CR=0.7):
+        super().__init__(func, bounds, population_size, max_generations, F, CR)
         self.surrogate = surrogate_model()
         self.convergence_history = []
         self.best_history = []
@@ -23,7 +23,7 @@ class surrogate_de(differential_evolution):
         for ind, fit in zip(pop, fitness):
             self.surrogate.add_sample(ind, fit)
 
-        for gen in range(100):
+        for gen in range(self.max_generations):
             self.surrogate.train()
             new_pop = np.zeros_like(pop)
             new_fitness = np.full(self.population_size, np.inf)

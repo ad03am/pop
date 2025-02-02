@@ -5,11 +5,13 @@ from functions import CECFunctions, generate_rotation_matrix, generate_shift_vec
 
 
 def parameter_tuning_experiment():
-    F_values = [0.4, 0.6, 0.8, 1.0]
-    CR_values = [0.3, 0.5, 0.7, 0.9]
-    population_sizes = [30, 50, 70, 100]
+    F_values = [0.1, 0.2, 0.5, 1.0, 3.0]
+    CR_values = [0.0, 0.25, 0.5, 0.75, 1.0]
+    population_sizes = [10, 25, 50, 100, 200]
+    max_generations = [10, 25, 50, 100, 200]
 
     dim = 10
+    repetitions = 10
     bounds = [(-100, 100)] * dim
     shift = generate_shift_vector(dim, bounds)
     rotation = generate_rotation_matrix(dim)
@@ -19,19 +21,19 @@ def parameter_tuning_experiment():
 
     results = {}
 
-    for F, CR, pop_size in product(F_values, CR_values, population_sizes):
-        key = (F, CR, pop_size)
+    for F, CR, pop_size, max_gen in product(F_values, CR_values, population_sizes, max_generations):
+        key = (F, CR, pop_size, max_gen)
         results[key] = []
-        print(f"Testing F={F}, CR={CR}, Pop={pop_size}")
+        print(f"Testing F={F}, CR={CR}, Pop={pop_size}, Gen={max_gen}")
 
-        for _ in range(10):
+        for _ in range(repetitions):
             de = differential_evolution(
                 objective_func,
                 bounds,
                 population_size=pop_size,
                 F=F,
                 CR=CR,
-                max_generations=100,
+                max_generations=max_gen,
             )
             _, fitness = de.optimize()
             results[key].append(fitness)
@@ -42,20 +44,20 @@ def parameter_tuning_experiment():
 def plot_parameter_results(results):
     plt.figure(figsize=(15, 5))
 
-    plt.subplot(131)
+    plt.subplot(141)
     F_values = sorted(set(k[0] for k in results.keys()))
     F_results = {F: [] for F in F_values}
-    for (F, _, _), values in results.items():
+    for (F, _, _, _), values in results.items():
         F_results[F].extend(values)
 
     plt.boxplot([F_results[F] for F in F_values], labels=[f"F={F}" for F in F_values])
     plt.title("Impact of F Parameter")
     plt.ylabel("Fitness")
 
-    plt.subplot(132)
+    plt.subplot(142)
     CR_values = sorted(set(k[1] for k in results.keys()))
     CR_results = {CR: [] for CR in CR_values}
-    for (_, CR, _), values in results.items():
+    for (_, CR, _, _), values in results.items():
         CR_results[CR].extend(values)
 
     plt.boxplot(
@@ -63,10 +65,10 @@ def plot_parameter_results(results):
     )
     plt.title("Impact of CR Parameter")
 
-    plt.subplot(133)
+    plt.subplot(143)
     pop_sizes = sorted(set(k[2] for k in results.keys()))
     pop_results = {pop: [] for pop in pop_sizes}
-    for (_, _, pop), values in results.items():
+    for (_, _, pop, _), values in results.items():
         pop_results[pop].extend(values)
 
     plt.boxplot(
@@ -74,6 +76,18 @@ def plot_parameter_results(results):
         labels=[f"Pop={pop}" for pop in pop_sizes],
     )
     plt.title("Impact of Population Size")
+
+    plt.subplot(144)
+    gen_sizes = sorted(set(k[3] for k in results.keys()))
+    gen_results = {gen: [] for gen in gen_sizes}
+    for (_, _, _, gen), values in results.items():
+        gen_results[gen].extend(values)
+
+    plt.boxplot(
+        [gen_results[gen] for gen in gen_sizes],
+        labels=[f"Gen={gen}" for gen in gen_sizes],
+    )
+    plt.title("Impact of Max Generations")
 
     plt.tight_layout()
     plt.savefig("parameter_tuning_results.png")

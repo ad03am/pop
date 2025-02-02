@@ -6,14 +6,14 @@ from functions import rastrigin, rosenbrock
 
 dim = 10
 bounds = [(-5.12, 5.12)] * dim
-n_runs = 30
+n_runs = 5
 
 print("Testing Standard DE...")
 standard_results = []
 standard_evals = []
 for i in range(n_runs):
     print(f"Run {i + 1}/{n_runs}")
-    de = differential_evolution(rosenbrock, bounds)
+    de = differential_evolution(rosenbrock, bounds, 50, 1000)
     _, fitness = de.optimize()
     print(f"Fitness: {fitness}")
     print(f"Evaluations: {de.evaluations}")
@@ -25,7 +25,7 @@ surrogate_results = []
 surrogate_evals = []
 for i in range(n_runs):
     print(f"Run {i + 1}/{n_runs}")
-    de = surrogate_de(rosenbrock, bounds)
+    de = surrogate_de(rosenbrock, bounds, 50, 1000)
     _, fitness = de.optimize()
     print(f"Fitness: {fitness}")
     print(f"Evaluations: {de.evaluations}")
