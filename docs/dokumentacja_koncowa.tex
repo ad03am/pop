@@ -27,7 +27,7 @@ Wykresy zostały wygenerowane przy użyciu biblioteki pyplot. Informacje dotycz�
 
 \section{Ewolucja różnicowa}
 Zaimplementowaliśmy algorytm ewolucji różnicowej z dwoma kryteriami stopu: maksymalną liczbą generacji oraz brakiem poprawy najlepszego osobnika przez określoną liczbę generacji.
-Maksymalna liczba ewaluacji jest więc równa iloczynowi maksymalnej liczby generacji i wielkości populacji. Zawsze jednak istnieje szansa na zatrzymanie algorytmu przez kryterium stopu stagnacji.  
+Maksymalna liczba ewaluacji jest więc równa iloczynowi maksymalnej liczby generacji i wielkości populacji. Zawsze jednak istnieje szansa na zatrzymanie algorytmu przez kryterium stopu stagnacji. Polego ono na sprawdzeniu czy przez określoną liczbę iteracji nie nastąpiła poprawa najlepszego osobnika. Jeżeli taka poprawa nie nastąpiła, algorytm kończy działanie.
 
 Do testowania algorytmu zostały użyte następujące zakresy parametrów:
 
@@ -36,39 +36,49 @@ Do testowania algorytmu zostały użyte następujące zakresy parametrów:
     \item F - współczynnik mutacji.
     \item Population size - wielkość populacji - dodatnia liczba całkowita.
     \item Max generations - maksymalna liczba generacji - dodatnia liczba całkowita.
+    \item Stagnation - liczba generacji bez poprawy najlepszego osobnika - dodatnia liczba całkowita.
 \end{enumerate}
 
 \subsection{Wyznaczanie parametrów ewolucji}
 
-Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 10 wymiarach i następujących wartości parametrów:
-
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{|c|c|c|c|}
-    \hline
-    \text{Miara F}   & \text{Miara CR}    & \text{Wielkość populacji} & \text{Maksymalna liczba generacji}  \\ \hline
-    0.1                 & 0.0                   & 10                        & 10                        \\ \hline
-    0.2                 & 0.25                  & 25                        & 25                        \\ \hline
-    0.5                 & 0.5                   & 50                        & 50                        \\ \hline
-    1.0                 & 0.75                  & 100                       & 100                       \\ \hline
-    3.0                 & 1.0                   & 200                       & 200                       \\ \hline
-    \end{tabular}
-    \caption{Parametry użyte w eksperymentach.}
-    \label{tab:de_parameters}
-\end{table}
-
-Przeprowadziliśmy eksperymenty na wszystkich kombinacjach wartości parametrów, dla każdego badania wykonaliśmy 30 iteracji.
-
-Dla każdej wartości uśredniliśmy wyniki uzyskane poprzez zmienianie pozostałych parametrów:
+Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 2 wymiarach. Wyznaczanie optymalnych parametrów algorytmu ewolucji różnicowej rozpoczęliśmy od wybrania domyślnych wartości wszystkich testowanych parametrów, które wydawały nam się sensowne. Dla tych wartości rozpoczęliśmy testowanie pojedynczych parametrów aby uzyskać przedziały wartości, które dają najlepsze wyniki. Dla najlepszych znalezionych przedziałów wartości przeprowadzaliśmyk kolejne testy, które ostatecznie pozwoliły nam na wybranie optymalnych wartości parametrów do dalszych testów. 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{parameter_tuning_results.png}
-    \caption{Wpływ parametrów na jakość algorytmu}
-    \label{fig:parameter_results}
+    \includegraphics[width=\textwidth]{parameter_tuning_results_separate1.png}
+    \caption{Wpływ parametrów na jakość algorytmu dla następujących wartości domyślnych: F = 0.5, CR = 0.5, wielkość populacji = 50, maksymalna liczba generacji = 100, stagnacja = 10}
+    \label{fig:parameter_results1}
 \end{figure}
 
-Spośród testowanych wartości parametrów najlepsze wyniki jakości uzyskano dla wartości parametrów: F = 0.5, CR = 0.25, wielkość populacji = 200, maksymalna liczba generacji = 200. Parametry F i CR mają swoje optymalne wartości pomiędzy 0 a 1, zaś zwiększanie wielkości populacji i maksymalnej liczba generacji zawsze prowadziło do poprawy jakości rozwiązania. Zwiększało to jednak znacznie czas obliczeń. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{parameter_tuning_results_separate2.png}
+    \caption{Wpływ parametrów na jakość algorytmu dla następujących wartości domyślnych: F = 0.5, CR = 0.5, wielkość populacji = 100, maksymalna liczba generacji = 100, stagnacja = 10}
+    \label{fig:parameter_results2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{parameter_tuning_results_separate3.png}
+    \caption{Wpływ parametrów na jakość algorytmu dla następujących wartości domyślnych: F = 0.5, CR = 0.5, wielkość populacji = 200, maksymalna liczba generacji = 100, stagnacja = 20}
+    \label{fig:parameter_results3}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{parameter_tuning_results_separate4.png}
+    \caption{Wpływ parametrów na jakość algorytmu dla następujących wartości domyślnych: F = 0.5, CR = 0.8, wielkość populacji = 200, maksymalna liczba generacji = 100, stagnacja = 40}
+    \label{fig:parameter_results4}
+\end{figure}
+
+Na podstawie przeprowadzonych eksperymentów wyznaczyliśmy optymalne wartości parametrów algorytmu ewolucji różnicowej:
+\begin{enumerate}
+    \item F - 0.5
+    \item CR - 0.7
+    \item Wielkość populacji - 200
+    \item Maksymalna liczba generacji - 200
+    \item Stagnacja - 30
+\end{enumerate}
 
 
 \section{Model zastępczy}
@@ -93,7 +103,7 @@ Model inicjowany jest 3 parametrami:
 
 Podczas inicjacji do historii dodawane są punkty z początkowej populacji.
 Model trenowany jest całą historią próbek przy każdej generacji populacji (wymagane jest zadane minimum próbek treningowych). Do historii dodawane są punkty z każdej faktycznej ewaluacji funkcji celu.
-Model wykorzystywany jest do predykcji wartości dla wszystkich nowych kandydatów. Parametr ewolucji różnicowej top\_percentage odpowiada za określenie ile procent najlepszych przewidywanych rozwiązań będzie rzeczywiście ewaluowanych.
+Model wykorzystywany jest do predykcji wartości dla wszystkich nowych kandydatów. Parametr ewolucji różnicowej top\_percentage odpowiada za określenie ile procent najlepszych przewidywanych rozwiązań będzie rzeczywiście ewaluowanych. Historia zewaluowanych punktów nie ma ograniczonego rozmiaru, a dodane do niej punkty nie są usuwane. Zapewnia to pełną informację o przestrzeniu przeszukiwań.
 
 \subsection{Wyznaczanie parametrów drzewa regresyjnego}
 
@@ -185,4 +195,61 @@ Na wykresach w dolnym rzędzie wyraźnie rysuje się różnica w jakości obydwu
 
 Przeprowadzone eksperymenty pokazały, że zastosowanie modelu zastępczego w ewolucji różnicowej pozwala na zmniejszenie liczby ewaluacji funkcji celu (dla testowanych funkcji średnio 36.37 \%). Jakość rozwiązań uzyskiwanych przez algorytm z modelem zastępczym jest średnio o 60.17\% gorsza niż w przypadku standardowej ewolucji różnicowej. W związku z tym, zastosowanie modelu zastępczego w ewolucji różnicowej może być uzasadnione jedynie w przypadku, gdy koszt obliczeń funkcji celu jest bardzo wysoki.
 
+\section{Wprowadzone zmiany w dokumentacji}
+
+\subsection{Zmiany w sekcji: ewolucja różnicowa}
+
+Dodatkowa informacja o kryterium stopu stagnacji:
+
+Polego ono na sprawdzeniu czy przez określoną liczbę iteracji nie nastąpiła poprawa najlepszego osobnika. Jeżeli taka poprawa nie nastąpiła, algorytm kończy działanie.
+
+\subsection{Zmiany w sekcji: wyznaczanie parametrów}
+
+Został zmieniony sposób szukania optymalnych parametrów do testowania algorytmu. Główną zmianą było sprawdzanie z jaką skutecznością algorytm trafiał w optimum globalne zamiast sprawdzania średniej jakości rozwiązania.
+
+
+Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 2 wymiarach. Wyznaczanie optymalnych parametrów algorytmu ewolucji różnicowej rozpoczęliśmy od wybrania domyślnych wartości wszystkich testowanych parametrów, które wydawały nam się sensowne. Dla tych wartości rozpoczęliśmy testowanie pojedynczych parametrów aby uzyskać przedziały wartości, które dają najlepsze wyniki. Dla najlepszych znalezionych przedziałów wartości przeprowadzaliśmyk kolejne testy, które ostatecznie pozwoliły nam na wybranie optymalnych wartości parametrów do dalszych testów. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{parameter_tuning_results_separate1.png}
+    \caption{Wpływ parametrów na jakość algorytmu dla następujących wartości domyślnych: F = 0.5, CR = 0.5, wielkość populacji = 50, maksymalna liczba generacji = 100, stagnacja = 10}
+    \label{fig:parameter_results1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{parameter_tuning_results_separate2.png}
+    \caption{Wpływ parametrów na jakość algorytmu dla następujących wartości domyślnych: F = 0.5, CR = 0.5, wielkość populacji = 100, maksymalna liczba generacji = 100, stagnacja = 10}
+    \label{fig:parameter_results2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{parameter_tuning_results_separate3.png}
+    \caption{Wpływ parametrów na jakość algorytmu dla następujących wartości domyślnych: F = 0.5, CR = 0.5, wielkość populacji = 200, maksymalna liczba generacji = 100, stagnacja = 20}
+    \label{fig:parameter_results3}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{parameter_tuning_results_separate4.png}
+    \caption{Wpływ parametrów na jakość algorytmu dla następujących wartości domyślnych: F = 0.5, CR = 0.8, wielkość populacji = 200, maksymalna liczba generacji = 100, stagnacja = 40}
+    \label{fig:parameter_results4}
+\end{figure}
+
+Na podstawie przeprowadzonych eksperymentów wyznaczyliśmy optymalne wartości parametrów algorytmu ewolucji różnicowej:
+\begin{enumerate}
+    \item F - 0.5
+    \item CR - 0.7
+    \item Wielkość populacji - 200
+    \item Maksymalna liczba generacji - 200
+    \item Stagnacja - 30
+\end{enumerate}
+
+\subsection{Zmiany w sekcji: model zastępczy}
+
+Dodano informacje o historii punktów zewaluowanych.
+
+Historia zewaluowanych punktów nie ma ograniczonego rozmiaru, a dodane do niej punkty nie są usuwane. Zapewnia to pełną informację o przestrzeniu przeszukiwań.
 \end{document}
