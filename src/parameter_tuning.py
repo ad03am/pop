@@ -11,7 +11,7 @@ def parameter_tuning_experiment():
     max_generations = [10, 25, 50, 100, 200]
 
     dim = 10
-    repetitions = 10
+    repetitions = 30
     bounds = [(-100, 100)] * dim
     shift = generate_shift_vector(dim, bounds)
     rotation = generate_rotation_matrix(dim)

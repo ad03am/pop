@@ -6,7 +6,7 @@ from functions import rastrigin, rosenbrock
 
 dim = 10
 bounds = [(-5.12, 5.12)] * dim
-n_runs = 5
+n_runs = 30
 
 print("Testing Standard DE...")
 standard_results = []

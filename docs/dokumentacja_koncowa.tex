@@ -21,16 +21,45 @@ Ewolucja różnicowa z modyfikacją wdrażającą nieszablonowy model zastępczy
 Ewolucja różnicowa (DE) jest skutecznym algorytmem optymalizacji globalnej, jednak jej główną wadą jest duża liczba wymaganych ewaluacji funkcji celu. W przypadku gdy obliczenie wartości funkcji celu jest czasochłonne lub kosztowne, może to znacząco ograniczać praktyczne zastosowanie algorytmu. Rozwiązaniem tego problemu może być zastosowanie modelu zastępczego (surrogate model), który aproksymuje wartość funkcji celu na podstawie wcześniej obliczonych punktów.
 
 \section{Implementacja}
-\subsection{Struktura projektu}
-Projekt został zaimplementowany w języku Python. Główny algorytm ewolucji różnicowej znajduje się w pliku differential\_evolution.py, natomiast jego zmodyfikowana wersja wykorzystująca model zastępczy w surrogate\_de.py. Funkcje testowe z benchmarku CEC oraz pomocnicze funkcje do przeprowadzania eksperymentów znajdują się odpowiednio w plikach functions.py oraz experiments.py. Skrypt plot.py odpowiada za ilustrację średniej liczby ewaluacji i jakości rozwiązań. 
+Projekt został zaimplementowany w języku Python. Główny algorytm ewolucji różnicowej znajduje się w pliku differential\_evolution.py, natomiast jego zmodyfikowana wersja wykorzystująca model zastępczy w surrogate\_de.py. Funkcje testowe z benchmarku CEC oraz pomocnicze funkcje do przeprowadzania eksperymentów znajdują się odpowiednio w plikach functions.py oraz experiments.py. Skrypty parameter\_tuning.py oraz tree\_parameters\_tuning.py służą do wyznaczenia optymalnych parametrów algorytmów ewolucji różnicowej oraz modelu zastępczego.
 
-\subsection{Model zastępczy}
-W ramach projektu jako model zastępczy stworzyliśmy drzewo regresyjne. Model wykorzystuje algorytm minimalizacji błędu średniokwadratowego (MSE), pozwalając na kontrolę głębokości drzewa i minimalnej liczby próbek w liściach. Implementacja znajduje się w pliku custom\_tree.py.
+Wykresy zostały wygenerowane przy użyciu biblioteki pyplot. Informacje dotyczące sposobu odczytywania informacji z wykresu pudełkowego można znaleźć na stronie: \url{https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.boxplot.html}.
 
-\section{Eksperymenty i wyniki}
+\section{Ewolucja różnicowa}
+Zaimplementowaliśmy algorytm ewolucji różnicowej z dwoma kryteriami stopu: maksymalną liczbą generacji oraz brakiem poprawy najlepszego osobnika przez określoną liczbę generacji.
+Maksymalna liczba ewaluacji jest więc równa iloczynowi maksymalnej liczby generacji i wielkości populacji. Zawsze jednak istnieje szansa na zatrzymanie algorytmu przez kryterium stopu stagnacji.  
 
-\subsection{Wyznaczanie parametrów algorytmu}
-W ramach eksperymentów przeprowadziliśmy analizę wpływu parametrów algorytmu na jego wydajność. W tym celu zmienialiśmy wartości współczynnika mutacji F (0.4-1.0), współczynnika krzyżowania CR (0.3-0.9) oraz rozmiaru populacji (30-100). Wyniki eksperymentów przedstawiono na rysunku:
+Do testowania algorytmu zostały użyte następujące zakresy parametrów:
+
+\begin{enumerate}
+    \item CR - prawdopodobieństwo krzyżowania. Wartość parametru CR jest definicyjnie narzucona i musi znajdować się w przedziale od 0 do 1.
+    \item F - współczynnik mutacji.
+    \item Population size - wielkość populacji - dodatnia liczba całkowita.
+    \item Max generations - maksymalna liczba generacji - dodatnia liczba całkowita.
+\end{enumerate}
+
+\subsection{Wyznaczanie parametrów ewolucji}
+
+Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 10 wymiarach i następujących wartości parametrów:
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    \text{Miara F}   & \text{Miara CR}    & \text{Wielkość populacji} & \text{Maksymalna liczba generacji}  \\ \hline
+    0.1                 & 0.0                   & 10                        & 10                        \\ \hline
+    0.2                 & 0.25                  & 25                        & 25                        \\ \hline
+    0.5                 & 0.5                   & 50                        & 50                        \\ \hline
+    1.0                 & 0.75                  & 100                       & 100                       \\ \hline
+    3.0                 & 1.0                   & 200                       & 200                       \\ \hline
+    \end{tabular}
+    \caption{Parametry użyte w eksperymentach.}
+    \label{tab:de_parameters}
+\end{table}
+
+Przeprowadziliśmy eksperymenty na wszystkich kombinacjach wartości parametrów, dla każdego badania wykonaliśmy 30 iteracji.
+
+Dla każdej wartości uśredniliśmy wyniki uzyskane poprzez zmienianie pozostałych parametrów:
 
 \begin{figure}[H]
     \centering
@@ -39,31 +68,65 @@ W ramach eksperymentów przeprowadziliśmy analizę wpływu parametrów algorytm
     \label{fig:parameter_results}
 \end{figure}
 
-Największe znaczenie na wynik algorytmu ma dobór współczynnika F - dla mniejszych jego wartości wynik był bliższy optimum. Większy rozmiar populacji nieznacznie poprawił wynik działania algorytmu. Wyższe wartości CR prowadzą do lepszej eksploracji przestrzeni rozwiązań.
+Spośród testowanych wartości parametrów najlepsze wyniki jakości uzyskano dla wartości parametrów: F = 0.5, CR = 0.25, wielkość populacji = 200, maksymalna liczba generacji = 200. Parametry F i CR mają swoje optymalne wartości pomiędzy 0 a 1, zaś zwiększanie wielkości populacji i maksymalnej liczba generacji zawsze prowadziło do poprawy jakości rozwiązania. Zwiększało to jednak znacznie czas obliczeń. 
 
-\subsection{Porównanie liczby ewaluacji funkcji celu}
-W celu porównania wydajności standardowego DE z DE przeprowadziliśmy eksperymenty na funkcjach Rosenbrocka i Rastrigina. Wyniki eksperymentów przedstawiono na rysunku:
 
-Dla funkcji Rastrigina:
+\section{Model zastępczy}
+W ramach projektu jako model zastępczy stworzyliśmy drzewo regresyjne. Model wykorzystuje algorytm minimalizacji błędu średniokwadratowego (MSE), pozwalając na kontrolę głębokości drzewa i minimalnej liczby próbek w liściach. Implementacja znajduje się w pliku custom\_tree.py.
+
+Proces trenowania modelu DecisionTreeRegressor jest realizowany poprzez rekurencyjne budowanie struktury drzewa, gdzie każdy węzeł reprezentuje punkt decyzyjny oparty na wartości konkretnej cechy.  Proces zaczyna się od inicjalizacji drzewa z określonymi parametrami kontrolującymi jego wzrost. Głównym elementem procesu trenowania jest procedura budowy drzewa, która rozpoczyna się od korzenia i rekurencyjnie tworzy kolejne węzły. W każdym węźle algorytm musi podjąć decyzję: czy utworzyć liść, czy kontynuować podział. Decyzja ta jest podejmowana na podstawie warunków stopu: osiągnięcie maksymalnej głębokości lub zbyt mała liczba próbek.
+
+Jeśli podział jest możliwy, algorytm poszukuje najlepszego sposobu podziału danych poprzez iterowanie po wszystkich dostępnych cechach i potencjalnych progach podziału. Dla każdej kombinacji cechy i progu obliczany jest błąd średniokwadratowy powstałych podzbiorów. Wybierany jest podział minimalizujący sumę błędów obu powstałych grup.
+
+Aby zwiększyć wydajność, progi podziału nie są wybierane ze wszystkich możliwych wartości cechy, lecz z wybranych percentyli, co znacząco redukuje przestrzeń poszukiwań. Implementacja wykorzystuje również operacje zwektoryzowane numpy, co przyspiesza obliczenia w porównaniu do tradycyjnych pętli.
+
+Po znalezieniu najlepszego podziału, dane dzielone są na dwie grupy, a proces jest rekurencyjnie powtarzany dla każdej z nich. Tworzy to strukturę drzewiastą, gdzie każdy węzeł wewnętrzny zawiera regułę podziału (cechę i próg), a każdy liść wartość przewidywaną - średnią wartość zmiennej celu dla próbek, które trafiły do tego liścia.
+
+Dzięki takiej strukturze można przewidywać wartości dla nowych próbek. Proces predykcji polega na przejściu od korzenia do odpowiedniego liścia, kierując się w każdym węźle regułami podziału i zwróceniu wartości zapisanej w liściu.
+
+Model inicjowany jest 3 parametrami:
+\begin{enumerate}
+    \item Maksymalna głębokość drzewa.
+    \item Minimalna liczba próbek do podziału.
+    \item Minimalna liczba próbek w liściu.
+\end{enumerate}
+
+Podczas inicjacji do historii dodawane są punkty z początkowej populacji.
+Model trenowany jest całą historią próbek przy każdej generacji populacji (wymagane jest zadane minimum próbek treningowych). Do historii dodawane są punkty z każdej faktycznej ewaluacji funkcji celu.
+Model wykorzystywany jest do predykcji wartości dla wszystkich nowych kandydatów. Parametr ewolucji różnicowej top\_percentage odpowiada za określenie ile procent najlepszych przewidywanych rozwiązań będzie rzeczywiście ewaluowanych.
+
+\subsection{Wyznaczanie parametrów drzewa regresyjnego}
+
+Aby wyznaczyć optymalne parametry drzewa regresyjnego, algorytm uruchomiliśmy dla dziesięciowymiarowej wersji funkcji Shifted Rotated Griewank z benchmarku CEC. Wyznaczyliśmy parametry drzewa regresyjnego dla wszystkich kombinacji wartości parametrów uruchomionych 30 razy:
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    \text{Głębokość}  & \text{Próbki przy podziale}    & \text{Próbki w liściu} & \text{Procent ewaluowanych} \\ \hline
+    2                   & 1                             & 1                         & 0.05 \\ \hline
+    4                   & 2                             & 3                         & 0.1 \\ \hline
+    7                   & 5                             & 5                         & 0.2 \\ \hline
+    10                  & 10                            & 10                        & 0.4 \\ \hline
+    \end{tabular}
+    \caption{Parametry użyte w eksperymentach.}
+    \label{tab:tr_parameters}
+\end{table}
+
+Dla każdej wartości uśredniliśmy wyniki uzyskane poprzez zmienianie pozostałych parametrów.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{results_evaluations_rastrigin.png}
-    \label{fig:results_evaluations}
+    \includegraphics[width=\textwidth]{tree_parameter_results.png}
+    \caption{Wpływ parametrów drzewa regresyjnego na jakość znajdowanych rozwiązań}
+    \label{fig:tree_results}
 \end{figure}
 
-Dla funkcji Rosenbrocka:
+Zmiana parametrów drzewa regresyjnego miała niewielki wpływ na jakość modelu zastępczego. Nieznacznie lepsze wyniki w porównaniu do reszty wartości parametrów uzyskano dla drzewa o maksymalnej głębokości 7, minimalnej liczbie próbek do podziału 5 oraz minimalnej liczbie próbek w liściu 5.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{results_evaluations_rosenbrock.png}
-    \caption{Porównanie liczby ewaluacji funkcji celu}
-    \label{fig:results_evaluations}
-\end{figure}
+Ciekawym parametrem ewolucji różnicowej z modelem zastępczym drzewa regresyjnego jest procent ewaluowanych rozwiązań. Na wykresie dobrze widać kompromis między liczbą wykonywanych ewaluacji a jakością znajdowanych rozwiązań. 
 
-Zastosowanie modelu zastępczego pozwoliło na znaczącą redukcję liczby ewaluacji funkcji celu. 
-
-\subsection{Porównanie wydajności}
+\section{Porównanie wydajności}
 
 Do testowania algorytmów wykorzystaliśmy funkcje testowe z benchmarku CEC: Shifted Sphere, Shifted Schwefel, Shifted Rotated Elliptic oraz Shifted Rotated Griewank.
 
@@ -74,9 +137,52 @@ Do testowania algorytmów wykorzystaliśmy funkcje testowe z benchmarku CEC: Shi
     \label{fig:comprehensive_results}
 \end{figure}
 
-Dla każdej testowanej funkcji, zgodnie z oczekiwaniami, użycie modelu zastępczego dawało gorsze wyniki.
+Wykresy przedstawiają wartości uśrednione po 50 powtórzeniach, dla każdej funkcji osobno. W górnym rzędzie znajduje się liczba ewaluacji wykonywanych przez algorytm ewolucji, a w dolnym najlepsze wartości w zależności od numeru generacji. 
+W większości przypadków algorytm z modelem zastępczym wykonuje mniej ewaluacji funkcji celu. Jedyną funkcją, dla której otrzymaliśmy inne wyniki, była Shifted Schwefel, w przypadku której standardowa ewolucja o wiele szybciej znajdowała optymalne rozwiązanie, przez co kryterium stopu stagnacji kończyło wywoływanie algorytmu, ukracając liczbę ewaluacji. Ewolucja z modelem zastępczym z powodu wolniejszego osiągania optymalnych rozwiązań nie spełniała kryterium stagnacji. 
+Na wykresach w dolnym rzędzie wyraźnie rysuje się różnica w jakości obydwu algorytmów. Algorytm z modelem zastępczym zwracał gorsze wyniki, co jest zgodne z oczekiwaniami, ponieważ model zastępczy jest tylko aproksymacją funkcji celu.
 
-\section{Wnioski}
-Przeprowadzone eksperymenty potwierdziły skuteczność zastosowania modelu zastępczego w redukcji liczby ewaluacji funkcji celu, kosztem dokładności zwracanego wyniku.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|r|r|r|}
+    \hline
+    & \textbf{Standardowa} & \textbf{Zastępcza} & \textbf{Różnica (\%)} \\
+    \hline
+    \text{Shifted Sphere} & 976.40 & 510.00 & -47.77\% \\
+    \hline
+    \text{Shifted Schwefel} & 442.20 & 510.00 & +15.33\% \\
+    \hline
+    \text{Shifted Rotated Elliptic} & 812.40 & 510.00 & -37.22\% \\
+    \hline
+    \text{Shifted Rotated Griewank} & 974.80 & 510.00 & -47.68\% \\
+    \hline
+    \textbf{Średnia} & 801.45 & 510.00 & -36.37\% \\
+    \hline
+    \end{tabular}
+    \caption{Średnia liczba ewaluacji funkcji celu}
+    \label{tab:evaluations}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|r|r|r|}
+    \hline
+    & \textbf{Standardowa} & \textbf{Zastępcza} & \textbf{Różnica (\%)} \\
+    \hline
+    \text{Shifted Sphere} & 172.55 & 1246.18 & +622.17\% \\
+    \hline
+    \text{Shifted Schwefel} & 20.66 & 20.62 & -0.18\% \\
+    \hline
+    \text{Shifted Rotated Elliptic} & 22176.33 & 34553.15 & +55.81\% \\
+    \hline
+    \text{Shifted Rotated Griewank} & 2.59 & 12.41 & +379.10\% \\
+    \hline
+    \textbf{Średnia} & 5593.03 & 8958.09 & +60.17\% \\
+    \hline
+    \end{tabular}
+    \caption{Średnia jakość najlepszego rozwiązania}
+    \label{tab:fitness}
+\end{table}
+
+Przeprowadzone eksperymenty pokazały, że zastosowanie modelu zastępczego w ewolucji różnicowej pozwala na zmniejszenie liczby ewaluacji funkcji celu (dla testowanych funkcji średnio 36.37 \%). Jakość rozwiązań uzyskiwanych przez algorytm z modelem zastępczym jest średnio o 60.17\% gorsza niż w przypadku standardowej ewolucji różnicowej. W związku z tym, zastosowanie modelu zastępczego w ewolucji różnicowej może być uzasadnione jedynie w przypadku, gdy koszt obliczeń funkcji celu jest bardzo wysoki.
 
 \end{document}

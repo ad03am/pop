@@ -4,14 +4,19 @@ from surrogate_model import surrogate_model
 
 
 class surrogate_de(differential_evolution):
-    def __init__(self, func, bounds, population_size=50, max_generations=100, F=0.8, CR=0.7):
+    def __init__(self, func, bounds, top_percentage=0.25, population_size=200, max_generations=200, F=0.5, CR=0.25, population=None):
         super().__init__(func, bounds, population_size, max_generations, F, CR)
+        self.top_percentage = top_percentage
+        self.population = population
         self.surrogate = surrogate_model()
         self.convergence_history = []
         self.best_history = []
 
     def optimize(self):
-        pop = self.initialize_population()
+        if self.population is None:
+            pop = self.initialize_population()
+        else:
+            pop = self.population
         fitness = np.array([self.evaluate(ind) for ind in pop])
 
         self.convergence_history = [np.mean(fitness)]
@@ -43,7 +48,7 @@ class surrogate_de(differential_evolution):
 
             pred = self.surrogate.predict(new_pop)
             if pred is not None:
-                best_candidates = np.argsort(pred)[: max(5, self.population_size // 4)]
+                best_candidates = np.argsort(pred)[: max(5, int(self.top_percentage * self.population_size))]
 
                 for idx in best_candidates:
                     new_fitness[idx] = self.evaluate(new_pop[idx])

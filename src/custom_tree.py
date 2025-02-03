@@ -10,7 +10,7 @@ class Node:
         self.is_leaf = False
 
 class DecisionTreeRegressor:
-    def __init__(self, max_depth=5, min_samples_split=2, min_samples_leaf=1):
+    def __init__(self, max_depth=7, min_samples_split=5, min_samples_leaf=5):
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf

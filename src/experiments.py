@@ -8,7 +8,7 @@ from functions import CECFunctions, generate_rotation_matrix, generate_shift_vec
 def run_experiments():
     dim = 10
     bounds = [(-100, 100)] * dim
-    n_runs = 20
+    n_runs = 50
 
     shift = generate_shift_vector(dim, bounds)
     rotation = generate_rotation_matrix(dim)
@@ -36,6 +36,16 @@ def run_experiments():
 
     results = {}
     convergence_data = {}
+    
+    all_evaluations = {
+        "Standard DE": {},
+        "Surrogate DE": {}
+    }
+    all_fitness = {
+        "Standard DE": {},
+        "Surrogate DE": {}
+    }
+    all_evaluations_lists = {}
 
     for func_name, (func, bound) in test_functions.items():
         print(f"\nTesting on {func_name}...")
@@ -43,25 +53,43 @@ def run_experiments():
 
         standard_results = []
         standard_convergence = []
-        for i in range(n_runs):
-            print(f"Standard DE - Run {i + 1}/{n_runs}")
-            de = differential_evolution(func, bounds)
-            _, fitness = de.optimize()
-            standard_results.append(fitness)
-            standard_convergence.append(de.convergence_history)
-
         surrogate_results = []
         surrogate_convergence = []
+        standard_evaluations = []
+        surrogate_evaluations = []
+        population_size = 30
+
         for i in range(n_runs):
-            print(f"Surrogate DE - Run {i + 1}/{n_runs}")
-            de = surrogate_de(func, bounds)
-            _, fitness = de.optimize()
+            print(f"Run {i + 1}/{n_runs}")
+
+            population = np.random.rand(population_size, dim)
+            for i in range(dim):
+                population[:][i] = (bounds[i][1] - bounds[i][0]) * population[:][i] + bounds[i][0]
+
+            std_de = differential_evolution(func, bounds, population_size=population_size, population=population.copy())
+            _, fitness = std_de.optimize()
+            standard_results.append(fitness)
+            standard_convergence.append(std_de.best_history)
+            standard_evaluations.append(std_de.evaluations)
+
+            sur_de = surrogate_de(func, bounds, population_size=population_size, population=population.copy())
+            _, fitness = sur_de.optimize()
             surrogate_results.append(fitness)
-            surrogate_convergence.append(de.convergence_history)
+            surrogate_convergence.append(sur_de.best_history)
+            surrogate_evaluations.append(sur_de.evaluations)
 
         results[func_name] = {
             "standard": standard_results,
             "surrogate": surrogate_results,
+        }
+
+        all_evaluations["Standard DE"][func_name] = np.mean(standard_evaluations)
+        all_evaluations["Surrogate DE"][func_name] = np.mean(surrogate_evaluations)
+        all_fitness["Standard DE"][func_name] = np.mean(standard_results)
+        all_fitness["Surrogate DE"][func_name] = np.mean(surrogate_results)
+        all_evaluations_lists[func_name] = {
+            "standard": standard_evaluations,
+            "surrogate": surrogate_evaluations
         }
 
         min_len = min(
@@ -78,29 +106,54 @@ def run_experiments():
             "generations": np.arange(min_len),
         }
 
-        p_value = differential_evolution.statistical_test(
-            standard_results, surrogate_results
-        )
-        print(f"\nStatistical test p-value: {p_value}")
-        if p_value < 0.05:
-            print("The difference is statistically significant")
-        else:
-            print("The difference is not statistically significant")
+    with open('algorithm_statistics.txt', 'w') as f:
+        f.write("Average Number of Evaluations:\n")
+        f.write("Algorithm | Shifted Sphere | Shifted Schwefel | Shifted Rotated Elliptic | Shifted Rotated Griewank\n")
+        f.write("-" * 100 + "\n")
+        
+        for alg in ["Standard DE", "Surrogate DE"]:
+            f.write(f"{alg} | ")
+            f.write(" | ".join(f"{all_evaluations[alg][func_name]:.2f}" 
+                             for func_name in test_functions.keys()))
+            f.write("\n")
+        
+        f.write("\n\n")
+        
+        f.write("Average Fitness Values:\n")
+        f.write("Algorithm | Shifted Sphere | Shifted Schwefel | Shifted Rotated Elliptic | Shifted Rotated Griewank\n")
+        f.write("-" * 100 + "\n")
+        
+        for alg in ["Standard DE", "Surrogate DE"]:
+            f.write(f"{alg} | ")
+            f.write(" | ".join(f"{all_fitness[alg][func_name]:.6f}" 
+                             for func_name in test_functions.keys()))
+            f.write("\n")
 
-    plot_results(results, convergence_data)
+    plot_results(results, convergence_data, all_evaluations_lists)
 
 
-def plot_results(results, convergence_data):
+def plot_results(results, convergence_data, all_evaluations_lists):
     n_funcs = len(results)
     fig, axes = plt.subplots(2, n_funcs, figsize=(5 * n_funcs, 10))
 
+    bar_width = 0.35
+    algorithms = ["Standard DE", "Surrogate DE"]
+    colors = ['blue', 'orange']
+
     for i, (func_name, func_results) in enumerate(results.items()):
-        bp = axes[0, i].boxplot(
-            [func_results["standard"], func_results["surrogate"]],
-            labels=["Standard DE", "Surrogate DE"],
-        )
-        axes[0, i].set_title(f"{func_name}\nFinal Fitness Distribution")
-        axes[0, i].set_yscale("log")
+        std_mean = np.mean(all_evaluations_lists[func_name]["standard"])
+        std_std = np.std(all_evaluations_lists[func_name]["standard"])
+        sur_mean = np.mean(all_evaluations_lists[func_name]["surrogate"])
+        sur_std = np.std(all_evaluations_lists[func_name]["surrogate"])
+        
+        means = [std_mean, sur_mean]
+        stds = [std_std, sur_std]
+        
+        x = np.arange(len(algorithms))
+        axes[0, i].bar(x, means, bar_width, yerr=stds, capsize=5, color=colors)
+        axes[0, i].set_xticks(x)
+        axes[0, i].set_xticklabels(algorithms)
+        axes[0, i].set_title(f"{func_name}\nNumber of Evaluations")
 
         conv_data = convergence_data[func_name]
         axes[1, i].plot(
@@ -117,7 +170,7 @@ def plot_results(results, convergence_data):
         )
         axes[1, i].set_title("Convergence History")
         axes[1, i].set_xlabel("Generation")
-        axes[1, i].set_ylabel("Average Fitness")
+        axes[1, i].set_ylabel("Best Fitness")
         axes[1, i].set_yscale("log")
         axes[1, i].grid(True, which="both", ls="-", alpha=0.2)
         axes[1, i].legend()

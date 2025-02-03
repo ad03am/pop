@@ -7,11 +7,12 @@ class differential_evolution:
         self,
         func,
         bounds,
-        population_size=50,
-        max_generations=100,
-        F=0.8,
-        CR=0.7,
+        population_size=200,
+        max_generations=200,
+        F=0.5,
+        CR=0.25,
         stagnation_generations=20,
+        population=None,
     ):
         self.func = func
         self.bounds = np.array(bounds)
@@ -22,6 +23,7 @@ class differential_evolution:
         self.CR = CR
         self.evaluations = 0
         self.stagnation_generations = stagnation_generations
+        self.population = population
         self.convergence_history = []
         self.best_history = []
 
@@ -38,7 +40,11 @@ class differential_evolution:
         return population
 
     def optimize(self):
-        population = self.initialize_population()
+        if self.population is None:
+            population = self.initialize_population()
+        else:
+            population = self.population
+
         fitness = np.array([self.evaluate(ind) for ind in population])
 
         self.convergence_history = [np.mean(fitness)]
@@ -82,22 +88,9 @@ class differential_evolution:
 
             if no_improvement_count >= self.stagnation_generations:
                 print(
-                    f"Zatrzymano z powodu stagnacji przez {self.stagnation_generations} generacji"
+                    f"Stopped because of stagnation for {self.stagnation_generations} generations"
                 )
-                print(f"Generacja: {generation + 1}/{self.max_generations}")
+                print(f"Generation: {generation + 1}/{self.max_generations}")
                 break
 
         return best_solution, best_fitness
-
-    @staticmethod
-    def statistical_test(results1, results2, alpha=0.05):
-        """Perform statistical significance test between two sets of results"""
-        _, p1 = stats.shapiro(results1)
-        _, p2 = stats.shapiro(results2)
-
-        if p1 > alpha and p2 > alpha:
-            _, p_value = stats.ttest_ind(results1, results2)
-        else:
-            _, p_value = stats.mannwhitneyu(results1, results2, alternative="two-sided")
-
-        return p_value
