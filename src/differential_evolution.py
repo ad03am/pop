@@ -32,12 +32,13 @@ class differential_evolution:
         return self.func(x)
 
     def initialize_population(self):
-        population = np.random.rand(self.population_size, self.dim)
+        self.population = np.zeros((self.population_size, self.dim))
+        
         for i in range(self.dim):
-            population[:, i] = (self.bounds[i, 1] - self.bounds[i, 0]) * population[
-                :, i
-            ] + self.bounds[i, 0]
-        return population
+            space = np.linspace(self.bounds[i][0], self.bounds[i][1], 
+                            int(np.ceil(np.power(self.population_size, 1/self.dim))))
+            indices = np.random.choice(len(space), size=self.population_size)
+            self.population[:, i] = space[indices]
 
     def optimize(self):
         if self.population is None:

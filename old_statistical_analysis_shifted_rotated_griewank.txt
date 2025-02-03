@@ -1,0 +1,73 @@
+Statistical Analysis for Shifted Rotated Griewank
+==================================================
+
+
+Comparison: Standard DE vs surrogate_de_1.0
+--------------------------------------------------
+
+Fitness Mann-Whitney U test:
+p-value: 1.4023e-01
+Effect size (Cohen's d): -0.1654
+
+Evaluations Mann-Whitney U test:
+p-value: 5.4911e-04
+Effect size (Cohen's d): -0.8355
+
+Success rate Fisher's exact test:
+p-value: 1.0000e+00
+
+Comparison: Standard DE vs surrogate_de_0.5
+--------------------------------------------------
+
+Fitness Mann-Whitney U test:
+p-value: 6.5319e-03
+Effect size (Cohen's d): -0.7687
+
+Evaluations Mann-Whitney U test:
+p-value: 2.1511e-02
+Effect size (Cohen's d): 0.7806
+
+Success rate Fisher's exact test:
+p-value: 4.8372e-02
+
+Comparison: Standard DE vs surrogate_de_0.25
+--------------------------------------------------
+
+Fitness Mann-Whitney U test:
+p-value: 5.1134e-06
+Effect size (Cohen's d): -1.6303
+
+Evaluations Mann-Whitney U test:
+p-value: 7.9772e-09
+Effect size (Cohen's d): 1.5886
+
+Success rate Fisher's exact test:
+p-value: 2.2098e-06
+
+Comparison: Standard DE vs surrogate_de_0.125
+--------------------------------------------------
+
+Fitness Mann-Whitney U test:
+p-value: 7.8541e-07
+Effect size (Cohen's d): -2.4317
+
+Evaluations Mann-Whitney U test:
+p-value: 7.9772e-09
+Effect size (Cohen's d): 2.0087
+
+Success rate Fisher's exact test:
+p-value: 2.2098e-06
+
+Comparison: Standard DE vs surrogate_de_0.0625
+--------------------------------------------------
+
+Fitness Mann-Whitney U test:
+p-value: 9.0467e-08
+Effect size (Cohen's d): -1.9025
+
+Evaluations Mann-Whitney U test:
+p-value: 7.9772e-09
+Effect size (Cohen's d): 2.2027
+
+Success rate Fisher's exact test:
+p-value: 1.5417e-07

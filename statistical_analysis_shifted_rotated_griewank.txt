@@ -1,0 +1,31 @@
+Statistical Analysis for Shifted Rotated Griewank
+==================================================
+
+
+Comparison: Standard DE vs surrogate_de_1.0
+--------------------------------------------------
+
+Fitness Mann-Whitney U test:
+p-value: 2.0605e-01
+Effect size (Cohen's d): 0.3623
+
+Evaluations Mann-Whitney U test:
+p-value: 1.1526e-01
+Effect size (Cohen's d): -0.1341
+
+Success rate Fisher's exact test:
+p-value: 1.0000e+00
+
+Comparison: Standard DE vs surrogate_de_0.5
+--------------------------------------------------
+
+Fitness Mann-Whitney U test:
+p-value: 1.1617e-01
+Effect size (Cohen's d): 0.1294
+
+Evaluations Mann-Whitney U test:
+p-value: 1.7187e-02
+Effect size (Cohen's d): 1.8378
+
+Success rate Fisher's exact test:
+p-value: 1.0000e+00

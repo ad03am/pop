@@ -1,0 +1,12 @@
+Average Number of Evaluations:
+Algorithm | Shifted Sphere | Shifted Schwefel | Shifted Rotated Elliptic | Shifted Rotated Griewank
+----------------------------------------------------------------------------------------------------
+Standard DE | 8580.00 | 8640.00 | 9960.00 | 6900.00
+Surrogate DE | 5100.00 | 5100.00 | 5100.00 | 5100.00
+
+
+Average Fitness Values:
+Algorithm | Shifted Sphere | Shifted Schwefel | Shifted Rotated Elliptic | Shifted Rotated Griewank
+----------------------------------------------------------------------------------------------------
+Standard DE | 0.000000 | 0.000000 | 0.000000 | 0.004838
+Surrogate DE | 0.000302 | 0.001417 | 0.008387 | 0.000010
