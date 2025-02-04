@@ -168,7 +168,7 @@ Dla wartości większych niż powyższe algorytm zwacał porównywalne wyniki, j
 
 \section{Porównanie wydajności}
 
-Do testowania algorytmów wykorzystaliśmy dwuwymiarowe funkcje testowe z benchmarku CEC: Shifted Sphere, Shifted Schwefel, Shifted Rotated Elliptic oraz Shifted Rotated Griewank. Każda z nich miała optimum globalne wynoszące 0.
+Do testowania algorytmów wykorzystaliśmy dwuwymiarowe funkcje testowe z benchmarku CEC: Shifted Sphere, Shifted Ackley, Shifted Rotated Elliptic oraz Shifted Rotated Griewank. Każda z nich miała optimum globalne wynoszące 0.
 
 \begin{figure}[H]
     \centering
@@ -180,7 +180,7 @@ Do testowania algorytmów wykorzystaliśmy dwuwymiarowe funkcje testowe z benchm
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{shifted_ackley.png}
-    \caption{Wykres funkcji Shifted Schwefel}
+    \caption{Wykres funkcji Shifted Ackley}
     \label{fig:plot2}
 \end{figure}
 
@@ -206,7 +206,7 @@ Do testowania algorytmów wykorzystaliśmy dwuwymiarowe funkcje testowe z benchm
 \end{figure}
 
 Wykresy przedstawiają wartości uśrednione po 50 powtórzeniach, dla każdej funkcji osobno. W górnym rzędzie znajduje się liczba ewaluacji wykonywanych przez algorytm ewolucji, a w dolnym najlepsze wartości w zależności od numeru generacji. 
-W większości przypadków algorytm z modelem zastępczym wykonuje mniej ewaluacji funkcji celu. Jedyną funkcją, dla której otrzymaliśmy inne wyniki, była Shifted Schwefel, w przypadku której standardowa ewolucja o wiele szybciej znajdowała optymalne rozwiązanie, przez co kryterium stopu stagnacji kończyło wywoływanie algorytmu, ukracając liczbę ewaluacji. Ewolucja z modelem zastępczym z powodu wolniejszego osiągania optymalnych rozwiązań nie spełniała kryterium stagnacji. 
+W większości przypadków algorytm z modelem zastępczym wykonuje mniej ewaluacji funkcji celu. Jedyną funkcją, dla której otrzymaliśmy inne wyniki, była Shifted Ackley, w przypadku której standardowa ewolucja o wiele szybciej znajdowała optymalne rozwiązanie, przez co kryterium stopu stagnacji kończyło wywoływanie algorytmu, ukracając liczbę ewaluacji. Ewolucja z modelem zastępczym z powodu wolniejszego osiągania optymalnych rozwiązań nie spełniała kryterium stagnacji. 
 Na wykresach w dolnym rzędzie wyraźnie rysuje się różnica w jakości obydwu algorytmów. Algorytm z modelem zastępczym zwracał gorsze wyniki, co jest zgodne z oczekiwaniami, ponieważ model zastępczy jest tylko aproksymacją funkcji celu.
 
 \begin{table}[H]
