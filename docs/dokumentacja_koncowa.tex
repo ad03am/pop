@@ -259,14 +259,14 @@ Przeprowadzone eksperymenty pokazały, że zastosowanie modelu zastępczego w ew
 
 Dodatkowa informacja o kryterium stopu stagnacji:
 
-Polego ono na sprawdzeniu czy przez określoną liczbę iteracji nie nastąpiła poprawa najlepszego osobnika. Jeżeli taka poprawa nie nastąpiła, algorytm kończy działanie.
+Polego ono na sprawdzeniu czy przez określoną liczbę generacji nie nastąpiła poprawa najlepszego osobnika. Jeżeli taka poprawa nie nastąpiła, algorytm kończy działanie.
 
 \subsection{Zmiany w sekcji: wyznaczanie parametrów}
 
-Został zmieniony sposób szukania optymalnych parametrów do testowania algorytmu. Główną zmianą było sprawdzanie z jaką skutecznością algorytm trafiał w optimum globalne zamiast sprawdzania średniej jakości rozwiązania.
+Zmieniony został sposób szukania optymalnych parametrów do testowania algorytmu. Główną zmianą było sprawdzanie z jaką skutecznością algorytm trafiał w optimum globalne zamiast sprawdzania średniej jakości rozwiązania.
 
 
-Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 2 wymiarach. Wyznaczanie optymalnych parametrów algorytmu ewolucji różnicowej rozpoczęliśmy od wybrania domyślnych wartości wszystkich testowanych parametrów, które wydawały nam się sensowne. Dla tych wartości rozpoczęliśmy testowanie pojedynczych parametrów aby uzyskać przedziały wartości, które dają najlepsze wyniki. Dla najlepszych znalezionych przedziałów wartości przeprowadzaliśmyk kolejne testy, które ostatecznie pozwoliły nam na wybranie optymalnych wartości parametrów do dalszych testów. Procent sukcesu, na podstawie którego sprawdzaliśmy jakość parametrów był uśredniany po 50 iteracjach. 
+Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 2 wymiarach. Wyznaczanie optymalnych parametrów algorytmu ewolucji różnicowej rozpoczęliśmy od wybrania domyślnych wartości wszystkich testowanych parametrów, które wydawały nam się sensowne. Dla tych wartości rozpoczęliśmy testowanie pojedynczych parametrów, aby uzyskać przedziały wartości, które dają najlepsze wyniki. Dla najlepszych znalezionych przedziałów wartości przeprowadzaliśmyk kolejne testy, które ostatecznie pozwoliły nam na wybranie optymalnych wartości parametrów do dalszych testów. Procent sukcesu, na podstawie którego sprawdzaliśmy jakość parametrów był uśredniany po 50 iteracjach. 
 
 \begin{figure}[H]
     \centering
