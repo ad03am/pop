@@ -205,53 +205,25 @@ Do testowania algorytmów wykorzystaliśmy dwuwymiarowe funkcje testowe z benchm
     \label{fig:comprehensive_results}
 \end{figure}
 
-Wykresy przedstawiają wartości uśrednione po 50 powtórzeniach, dla każdej funkcji osobno. W górnym rzędzie znajduje się liczba ewaluacji wykonywanych przez algorytm ewolucji, a w dolnym najlepsze wartości w zależności od numeru generacji. 
-W większości przypadków algorytm z modelem zastępczym wykonuje mniej ewaluacji funkcji celu. Jedyną funkcją, dla której otrzymaliśmy inne wyniki, była Shifted Ackley, w przypadku której standardowa ewolucja o wiele szybciej znajdowała optymalne rozwiązanie, przez co kryterium stopu stagnacji kończyło wywoływanie algorytmu, ukracając liczbę ewaluacji. Ewolucja z modelem zastępczym z powodu wolniejszego osiągania optymalnych rozwiązań nie spełniała kryterium stagnacji. 
-Na wykresach w dolnym rzędzie wyraźnie rysuje się różnica w jakości obydwu algorytmów. Algorytm z modelem zastępczym zwracał gorsze wyniki, co jest zgodne z oczekiwaniami, ponieważ model zastępczy jest tylko aproksymacją funkcji celu.
+Wykresy przedstawiają wartości uśrednione po 50 powtórzeniach, dla każdej funkcji osobno. W górnym rzędzie znajduje się średnia liczba ewaluacji wykonywanych przez algorytm ewolucji do spełnienia jednego z kryteriów stopu. W środkowym rzędzie przedstawione są najlepsze wartości znalezione przez algorytm w zależności od numeru generacji. W dolnym rzędzie znajduje się informacja o skuteczności, z jaką algorytm odnajdywał optimum globalne w ostatniej generacji. 
+W większości przypadków algorytm z modelem zastępczym wykonuje mniej ewaluacji funkcji celu. Jedyną funkcją, dla której otrzymaliśmy inne wyniki, była Shifted Rotated Griewank, w przypadku której standardowa ewolucja o wiele szybciej znajdowała optymalne rozwiązanie, przez co kryterium stopu kończyło wywoływanie algorytmu, ukracając liczbę ewaluacji. Ewolucja z modelem zastępczym z powodu wolniejszego osiągania optymalnych rozwiązań nie spełniała kryterium stagnacji, co powodowało wywoływanie kolejnych ewaluacji. 
+Standardowy algortm ewolucji różnicowej we wszystkich testach szybciej znajdował optymalne rozwiązania, jednak kosztem większej liczby ewaluacji funkcji celu.
 
-\begin{table}[H]
+\begin{table}[h]
     \centering
-    \begin{tabular}{|l|r|r|r|}
-    \hline
-    & \textbf{Standardowa} & \textbf{Zastępcza} & \textbf{Różnica (\%)} \\
-    \hline
-    \text{Shifted Sphere} & 976.40 & 510.00 & -47.77\% \\
-    \hline
-    \text{Shifted Schwefel} & 442.20 & 510.00 & +15.33\% \\
-    \hline
-    \text{Shifted Rotated Elliptic} & 812.40 & 510.00 & -37.22\% \\
-    \hline
-    \text{Shifted Rotated Griewank} & 974.80 & 510.00 & -47.68\% \\
-    \hline
-    \textbf{Średnia} & 801.45 & 510.00 & -36.37\% \\
-    \hline
+    \begin{tabular}{|l|c|c|c|}
+        \hline
+        Algorytm & Generacja & Śr. liczba ewaluacji & Skuteczność \\
+        \hline
+        Standardowa & 100 & 20200.00 & 1.00 \\
+        Zastępcza & 100 & 13200.00 & 0.79 \\
+        \hline
     \end{tabular}
-    \caption{Średnia liczba ewaluacji funkcji celu}
-    \label{tab:evaluations}
+    \caption{Porównanie działania algorytmów po 100 generacjach}
+    \label{tab:de_comparison}
 \end{table}
 
-\begin{table}[H]
-    \centering
-    \begin{tabular}{|l|r|r|r|}
-    \hline
-    & \textbf{Standardowa} & \textbf{Zastępcza} & \textbf{Różnica (\%)} \\
-    \hline
-    \text{Shifted Sphere} & 172.55 & 1246.18 & +622.17\% \\
-    \hline
-    \text{Shifted Schwefel} & 20.66 & 20.62 & -0.18\% \\
-    \hline
-    \text{Shifted Rotated Elliptic} & 22176.33 & 34553.15 & +55.81\% \\
-    \hline
-    \text{Shifted Rotated Griewank} & 2.59 & 12.41 & +379.10\% \\
-    \hline
-    \textbf{Średnia} & 5593.03 & 8958.09 & +60.17\% \\
-    \hline
-    \end{tabular}
-    \caption{Średnia jakość najlepszego rozwiązania}
-    \label{tab:fitness}
-\end{table}
-
-Przeprowadzone eksperymenty pokazały, że zastosowanie modelu zastępczego w ewolucji różnicowej pozwala na zmniejszenie liczby ewaluacji funkcji celu (dla testowanych funkcji średnio 36.37 \%). Jakość rozwiązań uzyskiwanych przez algorytm z modelem zastępczym jest średnio o 60.17\% gorsza niż w przypadku standardowej ewolucji różnicowej. W związku z tym, zastosowanie modelu zastępczego w ewolucji różnicowej może być uzasadnione jedynie w przypadku, gdy koszt obliczeń funkcji celu jest bardzo wysoki.
+Dane zawarte w powyższej tabeli pokazują, że po 100 generacjach standardowy algorytm znajduje optymalne rozwiązanie, podczas gdy algorytm z modelem zastępczym osiąga 79\% skuteczności. 
 
 \section{Wprowadzone zmiany w dokumentacji}
 
