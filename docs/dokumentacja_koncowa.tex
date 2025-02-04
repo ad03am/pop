@@ -207,7 +207,7 @@ Do testowania algorytmów wykorzystaliśmy dwuwymiarowe funkcje testowe z benchm
 
 Wykresy przedstawiają wartości uśrednione po 50 powtórzeniach, dla każdej funkcji osobno. W górnym rzędzie znajduje się średnia liczba ewaluacji wykonywanych przez algorytm ewolucji do spełnienia jednego z kryteriów stopu. W środkowym rzędzie przedstawione są najlepsze wartości znalezione przez algorytm w zależności od numeru generacji. W dolnym rzędzie znajduje się informacja o skuteczności, z jaką algorytm odnajdywał optimum globalne w ostatniej generacji. 
 W większości przypadków algorytm z modelem zastępczym wykonuje mniej ewaluacji funkcji celu. Jedyną funkcją, dla której otrzymaliśmy inne wyniki, była Shifted Rotated Griewank, w przypadku której standardowa ewolucja o wiele szybciej znajdowała optymalne rozwiązanie, przez co kryterium stopu kończyło wywoływanie algorytmu, ukracając liczbę ewaluacji. Ewolucja z modelem zastępczym z powodu wolniejszego osiągania optymalnych rozwiązań nie spełniała kryterium stagnacji, co powodowało wywoływanie kolejnych ewaluacji. 
-Standardowy algortm ewolucji różnicowej we wszystkich testach szybciej znajdował optymalne rozwiązania, jednak kosztem większej liczby ewaluacji funkcji celu.
+Standardowy algortm ewolucji różnicowej we wszystkich testach szybciej znajdował optymalne rozwiązania.
 
 \begin{table}[h]
     \centering
@@ -223,7 +223,7 @@ Standardowy algortm ewolucji różnicowej we wszystkich testach szybciej znajdow
     \label{tab:de_comparison}
 \end{table}
 
-Dane zawarte w powyższej tabeli pokazują, że po 100 generacjach standardowy algorytm znajduje optymalne rozwiązanie, podczas gdy algorytm z modelem zastępczym osiąga 79\% skuteczności. 
+Dane zawarte w poniższej tabeli pokazują uśrednioną liczbę ewaluacji oraz skuteczność trafień w optimum globalne algorytmów ewolucji po 100 generacjach. Algorytm standardowej ewolucji różnicowej znajduje już optymalne rozwiązanie, podczas gdy algorytm z modelem zastępczym osiąga dopiero 79\% skuteczności. Jednak algorytmowi z modelem zastępczym wystarcza ok 35\% ewaluacji do osiągnięcia takiego wyniku, c
 
 \section{Wprowadzone zmiany w dokumentacji}
 

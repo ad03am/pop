@@ -5,18 +5,20 @@ from surrogate_de import surrogate_de
 from functions import CECFunctions, generate_rotation_matrix, generate_shift_vector
 from itertools import product
 
-population_size = 100
-F = 0.3
-CR = 0.5
-max_generations = 100
-top_percentage = 0.5
-stagnation_generations = 20
-surrogate_update_freq = 5
+F = 0.5
+CR = 0.7
+population_size = 200
+max_generations = 300
+top_percentage = 0.65
+stagnation_generations = 30
+surrogate_update_freq = 16
+
+rounding = 1e-4
 
 def run_experiments():
     dim = 2
     bounds = [(-5, 5)] * dim
-    n_runs = 5
+    n_runs = 50
 
     shift = generate_shift_vector(dim, bounds)
     rotation = generate_rotation_matrix(dim)
@@ -60,6 +62,11 @@ def run_experiments():
     all_evaluations_lists = {}
     all_hits = {}
 
+    evaluation_history_data = {
+        "Standard DE": {func_name: [] for func_name in test_functions.keys()},
+        "Surrogate DE": {func_name: [] for func_name in test_functions.keys()}
+    }
+
     for func_name, (func, bound, optimum) in test_functions.items():
         print(f"\nTesting on {func_name}...")
         bounds = [bound] * dim
@@ -72,6 +79,9 @@ def run_experiments():
         surrogate_evaluations = []
         standard_hits = 0
         surrogate_hits = 0
+
+        standard_evaluation_histories = []
+        surrogate_evaluation_histories = []
 
         for i in range(n_runs):
             print(f"Run {i + 1}/{n_runs}")
@@ -89,7 +99,8 @@ def run_experiments():
             standard_results.append(fitness)
             standard_convergence.append(std_de.best_history)
             standard_evaluations.append(std_de.evaluations)
-            if np.abs(fitness - optimum) < 1e-2:
+            standard_evaluation_histories.append(std_de.evaluation_history)
+            if np.abs(fitness - optimum) < rounding:
                 standard_hits += 1
 
             sur_de = surrogate_de(func, bounds, top_percentage=top_percentage, population_size=population_size, max_generations=max_generations, F=F, CR=CR, stagnation_generations=stagnation_generations, population=population.copy(), surrogate_update_freq=surrogate_update_freq)
@@ -97,8 +108,12 @@ def run_experiments():
             surrogate_results.append(fitness)
             surrogate_convergence.append(sur_de.best_history)
             surrogate_evaluations.append(sur_de.evaluations)
-            if np.abs(fitness - optimum) < 1e-2:
+            surrogate_evaluation_histories.append(sur_de.evaluation_history)
+            if np.abs(fitness - optimum) < rounding:
                 surrogate_hits += 1
+
+        evaluation_history_data["Standard DE"][func_name] = standard_evaluation_histories
+        evaluation_history_data["Surrogate DE"][func_name] = surrogate_evaluation_histories
 
         results[func_name] = {
             "standard": standard_results,
@@ -118,53 +133,17 @@ def run_experiments():
             "surrogate": surrogate_hits / n_runs
         }
 
-        min_len = min(
-            min(len(hist) for hist in standard_convergence),
-            min(len(hist) for hist in surrogate_convergence),
-        )
-
-        # std_conv = []
-        # sur_conv = []
-        
-        # for hist in standard_convergence:
-        #     if len(hist) < max_generations:
-        #         extended_hist = np.pad(hist, (0, max_generations - len(hist)), 'edge')
-        #     else:
-        #         extended_hist = hist[:max_generations]
-        #     std_conv.append(extended_hist)
-            
-        # for hist in surrogate_convergence:
-        #     if len(hist) < max_generations:
-        #         extended_hist = np.pad(hist, (0, max_generations - len(hist)), 'edge')
-        #     else:
-        #         extended_hist = hist[:max_generations]
-        #     sur_conv.append(extended_hist)
-
-        # std_conv = np.mean([hist[:min_len] for hist in standard_convergence], axis=0)
-        # sur_conv = np.mean([hist[:min_len] for hist in surrogate_convergence], axis=0)
-
-        # convergence_data[func_name] = {
-        #     "standard": std_conv,
-        #     "surrogate": sur_conv,
-        #     "generations": np.arange(min_len),
-        # }
-
-        std_conv = np.zeros(max_generations)
-        sur_conv = np.zeros(max_generations)
+        std_conv = np.full(max_generations, np.nan)
+        sur_conv = np.full(max_generations, np.nan)
 
         for gen in range(max_generations):
-            std_values = [hist[gen] for hist in standard_convergence if gen < len(hist)]
-            sur_values = [hist[gen] for hist in surrogate_convergence if gen < len(hist)]
+            valid_std = [hist[gen] for hist in standard_convergence if gen < len(hist)]
+            valid_sur = [hist[gen] for hist in surrogate_convergence if gen < len(hist)]
             
-            if std_values:
-                std_conv[gen] = np.mean(std_values)
-            else:
-                std_conv[gen] = std_conv[gen-1] 
-                
-            if sur_values:
-                sur_conv[gen] = np.mean(sur_values)
-            else:
-                sur_conv[gen] = sur_conv[gen-1]
+            if valid_std:
+                std_conv[gen] = np.mean(valid_std)
+            if valid_sur:
+                sur_conv[gen] = np.mean(valid_sur)
 
         convergence_data[func_name] = {
             "standard": std_conv,
@@ -194,6 +173,32 @@ def run_experiments():
             f.write(" | ".join(f"{all_fitness[alg][func_name]:.6f}" 
                              for func_name in test_functions.keys()))
             f.write("\n")
+        
+        f.write("\n\n")
+        f.write("Statistics every 100 generations:\n\n")
+        
+        for func_name in test_functions.keys():
+            f.write(f"\n{func_name}:\n")
+            f.write("Algorithm | Generation | Avg Evaluations | Success Rate\n")
+            f.write("-" * 60 + "\n")
+            
+            for alg in ["Standard DE", "Surrogate DE"]:
+                histories = evaluation_history_data[alg][func_name]
+                unique_generations = sorted(set(gen for hist in histories for gen, _, _ in hist))
+                
+                for gen in unique_generations:
+                    if gen % 100 == 0 or gen == max(unique_generations):
+                        gen_data = []
+                        for hist in histories:
+                            matching_entries = [entry for entry in hist if entry[0] == gen]
+                            if matching_entries:
+                                gen_data.append(matching_entries[0])
+                        
+                        if gen_data:
+                            avg_evals = np.mean([entry[1] for entry in gen_data])
+                            success_rate = np.mean([np.abs(entry[2] - test_functions[func_name][2]) < rounding 
+                                                  for entry in gen_data])
+                            f.write(f"{alg} | {gen} | {avg_evals:.2f} | {success_rate:.2f}\n")
 
     plot_results(results, convergence_data, all_evaluations_lists, all_hits)
 
@@ -211,7 +216,6 @@ def plot_results(results, convergence_data, all_evaluations_lists, all_hits):
         sur_mean = np.mean(all_evaluations_lists[func_name]["surrogate"])
         sur_std = np.std(all_evaluations_lists[func_name]["surrogate"])
 
-        
         means = [std_mean, sur_mean]
         stds = [std_std, sur_std]
         
@@ -249,11 +253,9 @@ def plot_results(results, convergence_data, all_evaluations_lists, all_hits):
         axes[2, i].set_title("Success Rate")
         axes[2, i].set_ylim(0, 1)
 
-
     plt.tight_layout()
     plt.savefig("comprehensive_results.png", dpi=300, bbox_inches="tight")
     plt.close()
-
 
 if __name__ == "__main__":
     run_experiments()

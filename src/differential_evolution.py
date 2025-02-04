@@ -10,8 +10,8 @@ class differential_evolution:
         population_size=200,
         max_generations=200,
         F=0.5,
-        CR=0.25,
-        stagnation_generations=20,
+        CR=0.7,
+        stagnation_generations=30,
         population=None,
     ):
         self.func = func
@@ -26,6 +26,7 @@ class differential_evolution:
         self.population = population
         self.convergence_history = []
         self.best_history = []
+        self.evaluation_history = []
 
     def evaluate(self, x: np.ndarray):
         self.evaluations += 1
@@ -39,6 +40,8 @@ class differential_evolution:
                             int(np.ceil(np.power(self.population_size, 1/self.dim))))
             indices = np.random.choice(len(space), size=self.population_size)
             self.population[:, i] = space[indices]
+        
+        return self.population
 
     def optimize(self):
         if self.population is None:
@@ -55,6 +58,8 @@ class differential_evolution:
         self.best_history = [best_fitness]
         no_improvement_count = 0
         last_best_fitness = best_fitness
+
+        self.evaluation_history.append((0, self.evaluations, best_fitness))
 
         for generation in range(self.max_generations):
             for i in range(self.population_size):
@@ -87,11 +92,20 @@ class differential_evolution:
             self.convergence_history.append(np.mean(fitness))
             self.best_history.append(best_fitness)
 
+            if (generation + 1) % 100 == 0:
+                self.evaluation_history.append((generation + 1, self.evaluations, best_fitness))
+
+
             if no_improvement_count >= self.stagnation_generations:
                 print(
                     f"Stopped because of stagnation for {self.stagnation_generations} generations"
                 )
                 print(f"Generation: {generation + 1}/{self.max_generations}")
+                if (generation + 1) % 100 != 0:
+                    self.evaluation_history.append((generation + 1, self.evaluations, best_fitness))
                 break
+        if self.max_generations % 100 != 0:
+            self.evaluation_history.append((self.max_generations, self.evaluations, best_fitness))
+
 
         return best_solution, best_fitness

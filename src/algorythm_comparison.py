@@ -5,15 +5,20 @@ from surrogate_de import surrogate_de
 from functions import CECFunctions, generate_rotation_matrix, generate_shift_vector
 from scipy import stats
 
-def run_comparison(dim=2, n_runs=50):
-    # Test configuration
-    bounds = [(-100, 100)] * dim
+population_size = 100
+F = 0.5
+CR = 0.7
+max_generations = 200
+stagnation_generations = 30
+surrogate_update_freq = 5
+
+def run_comparison(dim=2, n_runs=30):
+    bounds = [(-5, 5)] * dim
     shift = generate_shift_vector(dim, bounds)
     rotation = generate_rotation_matrix(dim)
-    top_percentages = [1.0, 0.5]
-    population_size = 100
+    top_percentages = [0.5, 0.4, 0.3, 0.2, 0.1]
+    freqs = [5, 10, 20, 50]
     
-    # Dictionary to store results
     results = {
         "standard_de": {
             "fitness": [],
@@ -29,7 +34,6 @@ def run_comparison(dim=2, n_runs=50):
             "optima_found": []
         }
 
-    # Test functions with their theoretical optima
     test_functions = {
         # "Shifted Sphere": (
         #     lambda x: CECFunctions.shifted_sphere(x, shift),
@@ -47,18 +51,15 @@ def run_comparison(dim=2, n_runs=50):
         for run in range(n_runs):
             print(f"Run {run + 1}/{n_runs}")
             
-            # Initialize population
-            population = np.random.rand(population_size, dim)
-            for i in range(dim):
-                population[:, i] = (bounds[i][1] - bounds[i][0]) * population[:, i] + bounds[i][0]
+            population = np.zeros((population_size, dim))
             
-            # Run standard DE
-            std_de = differential_evolution(
-                func, 
-                bounds, 
-                population_size=population_size,
-                population=population.copy()
-            )
+            for i in range(dim):
+                space = np.linspace(bounds[i][0], bounds[i][1], 
+                                int(np.ceil(np.power(population_size, 1/dim))))
+                indices = np.random.choice(len(space), size=population_size)
+                population[:, i] = space[indices]
+            
+            std_de = differential_evolution(func, bounds, population_size=population_size, max_generations=max_generations, F=F, CR=CR, stagnation_generations=stagnation_generations, population=population.copy())
             _, std_fitness = std_de.optimize()
             
             results["standard_de"]["fitness"].append(std_fitness)
@@ -70,13 +71,7 @@ def run_comparison(dim=2, n_runs=50):
             for top_perc in top_percentages:
                 key = f"surrogate_de_{top_perc}"
                 print(f"  Testing with top_percentage={top_perc}")
-                sur_de = surrogate_de(
-                    func, 
-                    bounds, 
-                    population_size=population_size,
-                    population=population.copy(),
-                    top_percentage=top_perc
-                )
+                sur_de = surrogate_de(func, bounds, top_percentage=top_perc, population_size=population_size, max_generations=max_generations, F=F, CR=CR, stagnation_generations=stagnation_generations, population=population.copy(), surrogate_update_freq=surrogate_update_freq)
                 _, sur_fitness = sur_de.optimize()
                 
                 results[key]["fitness"].append(sur_fitness)
@@ -92,13 +87,10 @@ def run_comparison(dim=2, n_runs=50):
             #     np.abs(1 - theoretical_optimum) < 1e-6
             # )
 
-        # Save results
         # save_results(results, func_name)
         
-        # Create visualizations
         plot_results(results, func_name)
         
-        # Perform statistical tests
         perform_statistical_analysis(results, func_name)
 
 def save_results(results, func_name):
@@ -128,7 +120,6 @@ def save_results(results, func_name):
 def plot_results(results, func_name):
     plt.figure(figsize=(15, 5))
     
-    # Fitness comparison
     plt.subplot(131)
     data = [results[alg]["fitness"] for alg in results.keys()]
     plt.boxplot(data, labels=[alg.replace('_', ' ').title() for alg in results.keys()])
@@ -137,7 +128,6 @@ def plot_results(results, func_name):
     plt.yscale('log')
     plt.title('Fitness Comparison')
     
-    # Evaluations comparison
     plt.subplot(132)
     data = [results[alg]["evaluations"] for alg in results.keys()]
     plt.boxplot(data, labels=[alg.replace('_', ' ').title() for alg in results.keys()])
@@ -145,7 +135,6 @@ def plot_results(results, func_name):
     plt.ylabel('Number of Evaluations')
     plt.title('Evaluations Comparison')
     
-    # Success rate comparison
     plt.subplot(133)
     success_rates = [np.mean(results[alg]["optima_found"]) * 100 for alg in results.keys()]
     plt.bar(range(len(results)), success_rates)
@@ -163,7 +152,6 @@ def perform_statistical_analysis(results, func_name):
         f.write(f"Statistical Analysis for {func_name}\n")
         f.write("=" * 50 + "\n\n")
         
-        # Reference for comparison (standard DE)
         std_fitness = results["standard_de"]["fitness"]
         std_evals = results["standard_de"]["evaluations"]
         
@@ -174,7 +162,6 @@ def perform_statistical_analysis(results, func_name):
             f.write(f"\nComparison: Standard DE vs {algorithm}\n")
             f.write("-" * 50 + "\n")
             
-            # Fitness comparison
             stat, p_value = stats.mannwhitneyu(
                 std_fitness,
                 results[algorithm]["fitness"],
@@ -183,12 +170,10 @@ def perform_statistical_analysis(results, func_name):
             f.write(f"\nFitness Mann-Whitney U test:\n")
             f.write(f"p-value: {p_value:.4e}\n")
             
-            # Effect size (Cohen's d) for fitness
             d = (np.mean(std_fitness) - np.mean(results[algorithm]["fitness"])) / \
                 np.sqrt((np.var(std_fitness) + np.var(results[algorithm]["fitness"])) / 2)
             f.write(f"Effect size (Cohen's d): {d:.4f}\n")
             
-            # Evaluations comparison
             stat, p_value = stats.mannwhitneyu(
                 std_evals,
                 results[algorithm]["evaluations"],
@@ -197,12 +182,10 @@ def perform_statistical_analysis(results, func_name):
             f.write(f"\nEvaluations Mann-Whitney U test:\n")
             f.write(f"p-value: {p_value:.4e}\n")
             
-            # Effect size (Cohen's d) for evaluations
             d = (np.mean(std_evals) - np.mean(results[algorithm]["evaluations"])) / \
                 np.sqrt((np.var(std_evals) + np.var(results[algorithm]["evaluations"])) / 2)
             f.write(f"Effect size (Cohen's d): {d:.4f}\n")
             
-            # Success rate comparison
             stat, p_value = stats.fisher_exact([
                 [sum(results["standard_de"]["optima_found"]), 
                  len(std_fitness) - sum(results["standard_de"]["optima_found"])],
