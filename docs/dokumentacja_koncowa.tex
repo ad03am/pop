@@ -41,7 +41,7 @@ Do testowania algorytmu zostały użyte następujące zakresy parametrów:
 
 \subsection{Wyznaczanie parametrów ewolucji}
 
-Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 2 wymiarach. Wyznaczanie optymalnych parametrów algorytmu ewolucji różnicowej rozpoczęliśmy od wybrania domyślnych wartości wszystkich testowanych parametrów, które wydawały nam się sensowne. Dla tych wartości rozpoczęliśmy testowanie pojedynczych parametrów aby uzyskać przedziały wartości, które dają najlepsze wyniki. Dla najlepszych znalezionych przedziałów wartości przeprowadzaliśmyk kolejne testy, które ostatecznie pozwoliły nam na wybranie optymalnych wartości parametrów do dalszych testów. 
+Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 2 wymiarach. Wyznaczanie optymalnych parametrów algorytmu ewolucji różnicowej rozpoczęliśmy od wybrania domyślnych wartości wszystkich testowanych parametrów, które wydawały nam się sensowne. Dla tych wartości rozpoczęliśmy testowanie pojedynczych parametrów aby uzyskać przedziały wartości, które dają najlepsze wyniki. Dla najlepszych znalezionych przedziałów wartości przeprowadzaliśmyk kolejne testy, które ostatecznie pozwoliły nam na wybranie optymalnych wartości parametrów do dalszych testów. Procent sukcesu, na podstawie którego sprawdzaliśmy jakość parametrów był uśredniany po 50 iteracjach.
 
 \begin{figure}[H]
     \centering
@@ -76,7 +76,7 @@ Na podstawie przeprowadzonych eksperymentów wyznaczyliśmy optymalne wartości 
     \item F - 0.5
     \item CR - 0.7
     \item Wielkość populacji - 200
-    \item Maksymalna liczba generacji - 200
+    \item Maksymalna liczba generacji - 300
     \item Stagnacja - 30
 \end{enumerate}
 
@@ -107,38 +107,96 @@ Model wykorzystywany jest do predykcji wartości dla wszystkich nowych kandydat�
 
 \subsection{Wyznaczanie parametrów drzewa regresyjnego}
 
-Aby wyznaczyć optymalne parametry drzewa regresyjnego, algorytm uruchomiliśmy dla dziesięciowymiarowej wersji funkcji Shifted Rotated Griewank z benchmarku CEC. Wyznaczyliśmy parametry drzewa regresyjnego dla wszystkich kombinacji wartości parametrów uruchomionych 30 razy:
-
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{|c|c|c|c|}
-    \hline
-    \text{Głębokość}  & \text{Próbki przy podziale}    & \text{Próbki w liściu} & \text{Procent ewaluowanych} \\ \hline
-    2                   & 1                             & 1                         & 0.05 \\ \hline
-    4                   & 2                             & 3                         & 0.1 \\ \hline
-    7                   & 5                             & 5                         & 0.2 \\ \hline
-    10                  & 10                            & 10                        & 0.4 \\ \hline
-    \end{tabular}
-    \caption{Parametry użyte w eksperymentach.}
-    \label{tab:tr_parameters}
-\end{table}
-
-Dla każdej wartości uśredniliśmy wyniki uzyskane poprzez zmienianie pozostałych parametrów.
+Aby wyznaczyć optymalne parametry drzewa regresyjnego, algorytm uruchomiliśmy dla dwuwymiarowej wersji funkcji Shifted Rotated Griewank z benchmarku CEC. Wyznaczyliśmy parametry drzewa regresyjnego w ten sam sposób, co parametry ewolucji różnicowej - poprzez testowanie pojedynczych parametrów dla domyślnych wartości pozostałych parametrów.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{tree_parameter_results.png}
-    \caption{Wpływ parametrów drzewa regresyjnego na jakość znajdowanych rozwiązań}
-    \label{fig:tree_results}
+    \includegraphics[width=\textwidth]{tree_parameter_tuning_separate_results2.png}
+    \caption{Wpływ parametrów drzewa regresyjnego na skuteczność działania algorytmu dla następujących wartości domyślnych: maksymalna głębokość = 10, minimalna liczba próbek do podziału = 1, minimalna liczba próbek w liściu = 3}
+    \label{fig:tree_parameter_results1}
 \end{figure}
 
-Zmiana parametrów drzewa regresyjnego miała niewielki wpływ na jakość modelu zastępczego. Nieznacznie lepsze wyniki w porównaniu do reszty wartości parametrów uzyskano dla drzewa o maksymalnej głębokości 7, minimalnej liczbie próbek do podziału 5 oraz minimalnej liczbie próbek w liściu 5.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{tree_parameter_tuning_separate_results3.png}
+    \caption{Wpływ parametrów drzewa regresyjnego na skuteczność działania algorytmu dla następujących wartości domyślnych: maksymalna głębokość = 7, minimalna liczba próbek do podziału = 5, minimalna liczba próbek w liściu = 4}
+    \label{fig:tree_parameter_results2}
+\end{figure}
 
-Ciekawym parametrem ewolucji różnicowej z modelem zastępczym drzewa regresyjnego jest procent ewaluowanych rozwiązań. Na wykresie dobrze widać kompromis między liczbą wykonywanych ewaluacji a jakością znajdowanych rozwiązań. 
+Na podstawie przeprowadzonych eksperymentów udało nam się wyznaczyć optymalne parametry drzewa regresyjnego:
+
+\begin{enumerate}
+    \item Maksymalna głębokość - 7
+    \item Minimalna liczba próbek do podziału - 5
+    \item Minimalna liczba próbek w liściu - 4
+\end{enumerate}
+
+Ostatnie dwa parametry, które przetestowaliśmy w celu uzyskania jak najleszych wyników to:
+\begin{enumerate}
+    \item procent najlepszych rozwiązań, które będą ewaluowane
+    \item częstotliwość uczenia modelu zastępczego - co ile generacji model będzie trenowany na nowych danych
+\end{enumerate}
+
+Na podstawie ekperymentów, których wyniki zostały przedstawione poniżej, udało nam się wyznaczyć optymalne wartości tych parametrów:
+\begin{enumerate}
+    \item procent najlepszych rozwiązań, które będą ewaluowane - 0.65
+    \item częstotliwość uczenia modelu zastępczego - 16
+\end{enumerate}
+
+Dla wartości większych niż powyższe algorytm zwacał porównywalne wyniki, jednak kosztem większej ilości ewaluacji funkcji celu. Dla wartości mniejszych niż powyższe algortm zwracał gorsze wyniki.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{surrogate_de_parameter_tuning_results1.png}
+    \caption{Wpływ procentu najlepszych rozwiązań, które są ewaluowane oraz częstotliwości uczenia modelu na skuteczność działania algorytmu dla następujących wartości domyślnych: procent najlepszych rozwiązań = 0.5, częstotliwość uczenia = 5}
+    \label{fig:surogate_de_parameter_results1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{surrogate_de_parameter_tuning_results2.png}
+    \caption{Wpływ procentu najlepszych rozwiązań, które są ewaluowane oraz częstotliwości uczenia modelu na skuteczność działania algorytmu dla następujących wartości domyślnych: procent najlepszych rozwiązań = 0.7, częstotliwość uczenia = 10}
+    \label{fig:surogate_de_parameter_results2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{surrogate_de_parameter_tuning_results3.png}
+    \caption{Wpływ procentu najlepszych rozwiązań, które są ewaluowane oraz częstotliwości uczenia modelu na skuteczność działania algorytmu dla następujących wartości domyślnych: procent najlepszych rozwiązań = 0.7, częstotliwość uczenia = 15}
+    \label{fig:surogate_de_parameter_results3}
+\end{figure}
 
 \section{Porównanie wydajności}
 
-Do testowania algorytmów wykorzystaliśmy funkcje testowe z benchmarku CEC: Shifted Sphere, Shifted Schwefel, Shifted Rotated Elliptic oraz Shifted Rotated Griewank.
+Do testowania algorytmów wykorzystaliśmy dwuwymiarowe funkcje testowe z benchmarku CEC: Shifted Sphere, Shifted Schwefel, Shifted Rotated Elliptic oraz Shifted Rotated Griewank. Każda z nich miała optimum globalne wynoszące 0.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{shifted_sphere.png}
+    \caption{Wykres funkcji Shifted Sphere}
+    \label{fig:plot1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{shifted_ackley.png}
+    \caption{Wykres funkcji Shifted Schwefel}
+    \label{fig:plot2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{shifted_rotated_elliptic.png}
+    \caption{Wykres funkcji Shifted Rotated Elliptic}
+    \label{fig:plot3}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{shifted_rotated_griewank.png}
+    \caption{Wykres funkcji Shifted Rotated Griewank}
+    \label{fig:plot4}
+\end{figure}
 
 \begin{figure}[H]
     \centering
@@ -208,7 +266,7 @@ Polego ono na sprawdzeniu czy przez określoną liczbę iteracji nie nastąpiła
 Został zmieniony sposób szukania optymalnych parametrów do testowania algorytmu. Główną zmianą było sprawdzanie z jaką skutecznością algorytm trafiał w optimum globalne zamiast sprawdzania średniej jakości rozwiązania.
 
 
-Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 2 wymiarach. Wyznaczanie optymalnych parametrów algorytmu ewolucji różnicowej rozpoczęliśmy od wybrania domyślnych wartości wszystkich testowanych parametrów, które wydawały nam się sensowne. Dla tych wartości rozpoczęliśmy testowanie pojedynczych parametrów aby uzyskać przedziały wartości, które dają najlepsze wyniki. Dla najlepszych znalezionych przedziałów wartości przeprowadzaliśmyk kolejne testy, które ostatecznie pozwoliły nam na wybranie optymalnych wartości parametrów do dalszych testów. 
+Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 2 wymiarach. Wyznaczanie optymalnych parametrów algorytmu ewolucji różnicowej rozpoczęliśmy od wybrania domyślnych wartości wszystkich testowanych parametrów, które wydawały nam się sensowne. Dla tych wartości rozpoczęliśmy testowanie pojedynczych parametrów aby uzyskać przedziały wartości, które dają najlepsze wyniki. Dla najlepszych znalezionych przedziałów wartości przeprowadzaliśmyk kolejne testy, które ostatecznie pozwoliły nam na wybranie optymalnych wartości parametrów do dalszych testów. Procent sukcesu, na podstawie którego sprawdzaliśmy jakość parametrów był uśredniany po 50 iteracjach. 
 
 \begin{figure}[H]
     \centering
@@ -243,9 +301,73 @@ Na podstawie przeprowadzonych eksperymentów wyznaczyliśmy optymalne wartości 
     \item F - 0.5
     \item CR - 0.7
     \item Wielkość populacji - 200
-    \item Maksymalna liczba generacji - 200
+    \item Maksymalna liczba generacji - 300
     \item Stagnacja - 30
 \end{enumerate}
+
+\subsection{Zmiany w sekcji: wyznaczanie parametrów drzewa regresyjnego}
+
+Sekcja ta została całkowicie przerobiona aby lepiej przedstawić proces wyznaczania optymalnych parametrów drzewa regresyjnego.
+
+Aby wyznaczyć optymalne parametry drzewa regresyjnego, algorytm uruchomiliśmy dla dwuwymiarowej wersji funkcji Shifted Rotated Griewank z benchmarku CEC. Wyznaczyliśmy parametry drzewa regresyjnego w ten sam sposób, co parametry ewolucji różnicowej - poprzez testowanie pojedynczych parametrów dla domyślnych wartości pozostałych parametrów.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{tree_parameter_tuning_separate_results2.png}
+    \caption{Wpływ parametrów drzewa regresyjnego na skuteczność działania algorytmu dla następujących wartości domyślnych: maksymalna głębokość = 10, minimalna liczba próbek do podziału = 1, minimalna liczba próbek w liściu = 3}
+    \label{fig:tree_parameter_results1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{tree_parameter_tuning_separate_results3.png}
+    \caption{Wpływ parametrów drzewa regresyjnego na skuteczność działania algorytmu dla następujących wartości domyślnych: maksymalna głębokość = 7, minimalna liczba próbek do podziału = 5, minimalna liczba próbek w liściu = 4}
+    \label{fig:tree_parameter_results2}
+\end{figure}
+
+Na podstawie przeprowadzonych eksperymentów udało nam się wyznaczyć optymalne parametry drzewa regresyjnego:
+
+\begin{enumerate}
+    \item Maksymalna głębokość - 7
+    \item Minimalna liczba próbek do podziału - 5
+    \item Minimalna liczba próbek w liściu - 4
+\end{enumerate}
+
+Ostatnie dwa parametry, które przetestowaliśmy w celu uzyskania jak najleszych wyników to:
+\begin{enumerate}
+    \item procent najlepszych rozwiązań, które będą ewaluowane
+    \item częstotliwość uczenia modelu zastępczego - co ile generacji model będzie trenowany na nowych danych
+\end{enumerate}
+
+Na podstawie ekperymentów, których wyniki zostały przedstawione poniżej, udało nam się wyznaczyć optymalne wartości tych parametrów:
+\begin{enumerate}
+    \item procent najlepszych rozwiązań, które będą ewaluowane - 0.65
+    \item częstotliwość uczenia modelu zastępczego - 16
+\end{enumerate}
+
+Dla wartości większych niż powyższe algorytm zwacał porównywalne wyniki, jednak kosztem większej ilości ewaluacji funkcji celu. Dla wartości mniejszych niż powyższe algortm zwracał gorsze wyniki.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{surrogate_de_parameter_tuning_results1.png}
+    \caption{Wpływ procentu najlepszych rozwiązań, które są ewaluowane oraz częstotliwości uczenia modelu na skuteczność działania algorytmu dla następujących wartości domyślnych: procent najlepszych rozwiązań = 0.5, częstotliwość uczenia = 5}
+    \label{fig:surogate_de_parameter_results1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{surrogate_de_parameter_tuning_results2.png}
+    \caption{Wpływ procentu najlepszych rozwiązań, które są ewaluowane oraz częstotliwości uczenia modelu na skuteczność działania algorytmu dla następujących wartości domyślnych: procent najlepszych rozwiązań = 0.7, częstotliwość uczenia = 10}
+    \label{fig:surogate_de_parameter_results2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{surrogate_de_parameter_tuning_results3.png}
+    \caption{Wpływ procentu najlepszych rozwiązań, które są ewaluowane oraz częstotliwości uczenia modelu na skuteczność działania algorytmu dla następujących wartości domyślnych: procent najlepszych rozwiązań = 0.7, częstotliwość uczenia = 15}
+    \label{fig:surogate_de_parameter_results3}
+\end{figure}
+
 
 \subsection{Zmiany w sekcji: model zastępczy}
 
