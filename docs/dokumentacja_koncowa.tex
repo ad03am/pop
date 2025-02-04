@@ -41,7 +41,7 @@ Do testowania algorytmu zostały użyte następujące zakresy parametrów:
 
 \subsection{Wyznaczanie parametrów ewolucji}
 
-Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 2 wymiarach. Wyznaczanie optymalnych parametrów algorytmu ewolucji różnicowej rozpoczęliśmy od wybrania domyślnych wartości wszystkich testowanych parametrów, które wydawały nam się sensowne. Dla tych wartości rozpoczęliśmy testowanie pojedynczych parametrów aby uzyskać przedziały wartości, które dają najlepsze wyniki. Dla najlepszych znalezionych przedziałów wartości przeprowadzaliśmyk kolejne testy, które ostatecznie pozwoliły nam na wybranie optymalnych wartości parametrów do dalszych testów. Procent sukcesu, na podstawie którego sprawdzaliśmy jakość parametrów był uśredniany po 50 iteracjach.
+Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 2 wymiarach. Do wyznaczania optymalnych wartości parametrów algorytmu ewolucji różnicowej podeszliśmy iteracyjnie - przez wybieranie coraz to lepszych przedziałów wartości. W każdej iteracji rozpoczynaliśmy od wybrania domyślnych wartości oraz sprawdzanych przedziałów wszystkich testowanych parametrów. Dla tych wartości i przedziałów testowaliśmy każdy parametr z osobna (w czasie testowania jednego parametru wartości pozostałych pozostają niezmienne), porównując procent trafień algorytmu w optimum globalne. Dla najlepszych znalezionych przedziałów wartości przeprowadzaliśmy kolejne testy, zawężając sprawdzane zakresy i aktualizując domyślne wartości. Ostatecznie pozwoliło nam to na wybranie optymalnych wartości parametrów do dalszych testów. Procent sukcesu, na podstawie którego sprawdzaliśmy jakość parametrów, był uśredniany po 50 iteracjach. 
 
 \begin{figure}[H]
     \centering
@@ -265,8 +265,7 @@ Polego ono na sprawdzeniu czy przez określoną liczbę generacji nie nastąpił
 
 Zmieniony został sposób szukania optymalnych parametrów do testowania algorytmu. Główną zmianą było sprawdzanie z jaką skutecznością algorytm trafiał w optimum globalne zamiast sprawdzania średniej jakości rozwiązania.
 
-
-Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 2 wymiarach. Wyznaczanie optymalnych parametrów algorytmu ewolucji różnicowej rozpoczęliśmy od wybrania domyślnych wartości wszystkich testowanych parametrów, które wydawały nam się sensowne. Dla tych wartości rozpoczęliśmy testowanie pojedynczych parametrów, aby uzyskać przedziały wartości, które dają najlepsze wyniki. Dla najlepszych znalezionych przedziałów wartości przeprowadzaliśmyk kolejne testy, które ostatecznie pozwoliły nam na wybranie optymalnych wartości parametrów do dalszych testów. Procent sukcesu, na podstawie którego sprawdzaliśmy jakość parametrów był uśredniany po 50 iteracjach. 
+Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 2 wymiarach. Do wyznaczania optymalnych wartości parametrów algorytmu ewolucji różnicowej podeszliśmy iteracyjnie - przez wybieranie coraz to lepszych przedziałów wartości. W każdej iteracji rozpoczynaliśmy od wybrania domyślnych wartości oraz sprawdzanych przedziałów wszystkich testowanych parametrów. Dla tych wartości i przedziałów testowaliśmy każdy parametr z osobna (w czasie testowania jednego parametru wartości pozostałych pozostają niezmienne), porównując procent trafień algorytmu w optimum globalne. Dla najlepszych znalezionych przedziałów wartości przeprowadzaliśmy kolejne testy, zawężając sprawdzane zakresy i aktualizując domyślne wartości. Ostatecznie pozwoliło nam to na wybranie optymalnych wartości parametrów do dalszych testów. Procent sukcesu, na podstawie którego sprawdzaliśmy jakość parametrów, był uśredniany po 50 iteracjach. 
 
 \begin{figure}[H]
     \centering
@@ -345,7 +344,7 @@ Na podstawie ekperymentów, których wyniki zostały przedstawione poniżej, uda
     \item częstotliwość uczenia modelu zastępczego - 16
 \end{enumerate}
 
-Dla wartości większych niż powyższe algorytm zwacał porównywalne wyniki, jednak kosztem większej ilości ewaluacji funkcji celu. Dla wartości mniejszych niż powyższe algortm zwracał gorsze wyniki.
+Dla wartości większych niż powyższe algorytm zwracał porównywalne wyniki, jednak kosztem większej liczby ewaluacji funkcji celu. Dla wartości mniejszych niż powyższe algortm zwracał gorsze wyniki.
 
 \begin{figure}[H]
     \centering
@@ -373,5 +372,5 @@ Dla wartości większych niż powyższe algorytm zwacał porównywalne wyniki, j
 
 Dodano informacje o historii punktów zewaluowanych.
 
-Historia zewaluowanych punktów nie ma ograniczonego rozmiaru, a dodane do niej punkty nie są usuwane. Zapewnia to pełną informację o przestrzeniu przeszukiwań.
+Historia zewaluowanych punktów nie ma ograniczonego rozmiaru, a dodane do niej punkty nie są usuwane. Zapewnia to pełną informację o przestrzeni przeszukiwań.
 \end{document}
