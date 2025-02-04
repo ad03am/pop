@@ -43,6 +43,8 @@ Do testowania algorytmu zostały użyte następujące zakresy parametrów:
 
 Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 2 wymiarach. Do wyznaczania optymalnych wartości parametrów algorytmu ewolucji różnicowej podeszliśmy iteracyjnie - przez wybieranie coraz to lepszych przedziałów wartości. W każdej iteracji rozpoczynaliśmy od wybrania domyślnych wartości oraz sprawdzanych przedziałów wszystkich testowanych parametrów. Dla tych wartości i przedziałów testowaliśmy każdy parametr z osobna (w czasie testowania jednego parametru wartości pozostałych pozostają niezmienne), porównując procent trafień algorytmu w optimum globalne. Dla najlepszych znalezionych przedziałów wartości przeprowadzaliśmy kolejne testy, zawężając sprawdzane zakresy i aktualizując domyślne wartości. Ostatecznie pozwoliło nam to na wybranie optymalnych wartości parametrów do dalszych testów. Procent sukcesu, na podstawie którego sprawdzaliśmy jakość parametrów, był uśredniany po 50 iteracjach. 
 
+Jako trafienie w optimum globalne uznawana jest wartość zwracana przez algorytm, którego różnica z optimum globalnym funkcji celu jest mniejsza niż 1e-6. Dla wszystkich funkcji testowych optimum globalne wynosi 0.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{parameter_tuning_results_separate1.png}
@@ -105,6 +107,8 @@ Podczas inicjacji do historii dodawane są punkty z początkowej populacji.
 Model trenowany jest całą historią próbek przy każdej generacji populacji (wymagane jest zadane minimum próbek treningowych). Do historii dodawane są punkty z każdej faktycznej ewaluacji funkcji celu.
 Model wykorzystywany jest do predykcji wartości dla wszystkich nowych kandydatów. Parametr ewolucji różnicowej top\_percentage odpowiada za określenie ile procent najlepszych przewidywanych rozwiązań będzie rzeczywiście ewaluowanych. Historia zewaluowanych punktów nie ma ograniczonego rozmiaru, a dodane do niej punkty nie są usuwane. Zapewnia to pełną informację o przestrzeniu przeszukiwań.
 
+Model trenowany jest na początku optymalizacji (zaraz po inicjalizacji populacji i obliczeniu pierwszych wartości fitness), a także co określoną przez parametr liczbę generacji (domyślnie 16), przed selekcją. 
+
 \subsection{Wyznaczanie parametrów drzewa regresyjnego}
 
 Aby wyznaczyć optymalne parametry drzewa regresyjnego, algorytm uruchomiliśmy dla dwuwymiarowej wersji funkcji Shifted Rotated Griewank z benchmarku CEC. Wyznaczyliśmy parametry drzewa regresyjnego w ten sam sposób, co parametry ewolucji różnicowej - poprzez testowanie pojedynczych parametrów dla domyślnych wartości pozostałych parametrów.
@@ -143,7 +147,10 @@ Na podstawie ekperymentów, których wyniki zostały przedstawione poniżej, uda
     \item częstotliwość uczenia modelu zastępczego - 16
 \end{enumerate}
 
-Dla wartości większych niż powyższe algorytm zwacał porównywalne wyniki, jednak kosztem większej ilości ewaluacji funkcji celu. Dla wartości mniejszych niż powyższe algortm zwracał gorsze wyniki.
+Dla wyższego procentu ewaluowanych rozwiązań algorytm zwacał porównywalne wyniki, kosztem większej liczby ewaluacji funkcji celu. Dla niższego procentu ewaluowanych rozwiązań algortm zwracał gorsze wyniki.
+
+Im rzadziej algorytm ewaluował model, tym gorsze wyniki zwracał. Dla wartości większych niż 16 algorytm zwracał porównywalne wyniki.
+
 
 \begin{figure}[H]
     \centering
@@ -205,39 +212,32 @@ Do testowania algorytmów wykorzystaliśmy dwuwymiarowe funkcje testowe z benchm
     \label{fig:comprehensive_results}
 \end{figure}
 
+Dla każdej z funkcji testowych uruchomiliśmy algorytm ewolucji różnicowej standardowej oraz z modelem zastępczym, używając wcześniej wyznaczonych optymalnych parametrów wywołania.
+
 Wykresy przedstawiają wartości uśrednione po 50 powtórzeniach, dla każdej funkcji osobno. W górnym rzędzie znajduje się średnia liczba ewaluacji wykonywanych przez algorytm ewolucji do spełnienia jednego z kryteriów stopu. W środkowym rzędzie przedstawione są najlepsze wartości znalezione przez algorytm w zależności od numeru generacji. W dolnym rzędzie znajduje się informacja o skuteczności, z jaką algorytm odnajdywał optimum globalne w ostatniej generacji. 
+
 W większości przypadków algorytm z modelem zastępczym wykonuje mniej ewaluacji funkcji celu. Jedyną funkcją, dla której otrzymaliśmy inne wyniki, była Shifted Rotated Griewank, w przypadku której standardowa ewolucja o wiele szybciej znajdowała optymalne rozwiązanie, przez co kryterium stopu kończyło wywoływanie algorytmu, ukracając liczbę ewaluacji. Ewolucja z modelem zastępczym z powodu wolniejszego osiągania optymalnych rozwiązań nie spełniała kryterium stagnacji, co powodowało wywoływanie kolejnych ewaluacji. 
+
 Standardowy algortm ewolucji różnicowej we wszystkich testach szybciej znajdował optymalne rozwiązania.
+Algorytmy dla wszystkich funkcji testowych trafiały w okolice optimum globalnego, jednak standardowy algorytm szybciej otrzymywał dokładniejsze wartości.
 
-\begin{table}[h]
-    \centering
-    \begin{tabular}{|l|c|c|c|}
-        \hline
-        Algorytm & Generacja & Śr. liczba ewaluacji & Skuteczność \\
-        \hline
-        Standardowa & 100 & 20200.00 & 1.00 \\
-        Zastępcza & 100 & 13200.00 & 0.79 \\
-        \hline
-    \end{tabular}
-    \caption{Porównanie działania algorytmów po 100 generacjach}
-    \label{tab:de_comparison}
-\end{table}
 
-Dane zawarte w poniższej tabeli pokazują uśrednioną liczbę ewaluacji oraz skuteczność trafień w optimum globalne algorytmów ewolucji po 100 generacjach. Algorytm standardowej ewolucji różnicowej znajduje już optymalne rozwiązanie, podczas gdy algorytm z modelem zastępczym osiąga dopiero 79\% skuteczności. Jednak algorytmowi z modelem zastępczym wystarcza ok 35\% ewaluacji do osiągnięcia takiego wyniku, c
 
 \section{Wprowadzone zmiany w dokumentacji}
 
-\subsection{Zmiany w sekcji: ewolucja różnicowa}
+\subsection{Zmiany w sekcji: Ewolucja różnicowa}
 
-Dodatkowa informacja o kryterium stopu stagnacji:
+Dodatkowa informacja o kryterium stopu stagnacji oraz o częstotliwości trenowania modelu zastępczego:
 
-Polego ono na sprawdzeniu czy przez określoną liczbę generacji nie nastąpiła poprawa najlepszego osobnika. Jeżeli taka poprawa nie nastąpiła, algorytm kończy działanie.
+Kryterium stopu stagnacji polega na sprawdzeniu czy przez określoną liczbę generacji nie nastąpiła poprawa najlepszego osobnika. Jeżeli taka poprawa nie nastąpiła, algorytm kończy działanie.
 
-\subsection{Zmiany w sekcji: wyznaczanie parametrów}
+\subsection{Zmiany w sekcji: Wyznaczanie parametrów}
 
 Zmieniony został sposób szukania optymalnych parametrów do testowania algorytmu. Główną zmianą było sprawdzanie z jaką skutecznością algorytm trafiał w optimum globalne zamiast sprawdzania średniej jakości rozwiązania.
 
 Badanie zaczęliśmy od wyznaczania optymalnych parametrów ewolucji różnicowej. W tym celu przeprowadziliśmy eksperymenty dla funkcji Shifted Rotated Griewank z benchmarku CEC o 2 wymiarach. Do wyznaczania optymalnych wartości parametrów algorytmu ewolucji różnicowej podeszliśmy iteracyjnie - przez wybieranie coraz to lepszych przedziałów wartości. W każdej iteracji rozpoczynaliśmy od wybrania domyślnych wartości oraz sprawdzanych przedziałów wszystkich testowanych parametrów. Dla tych wartości i przedziałów testowaliśmy każdy parametr z osobna (w czasie testowania jednego parametru wartości pozostałych pozostają niezmienne), porównując procent trafień algorytmu w optimum globalne. Dla najlepszych znalezionych przedziałów wartości przeprowadzaliśmy kolejne testy, zawężając sprawdzane zakresy i aktualizując domyślne wartości. Ostatecznie pozwoliło nam to na wybranie optymalnych wartości parametrów do dalszych testów. Procent sukcesu, na podstawie którego sprawdzaliśmy jakość parametrów, był uśredniany po 50 iteracjach. 
+
+Jako trafienie w optimum globalne uznawana jest wartość zwracana przez algorytm, którego różnica z optimum globalnym funkcji celu jest mniejsza niż 1e-6. Dla wszystkich funkcji testowych optimum globalne wynosi 0.
 
 \begin{figure}[H]
     \centering
@@ -276,7 +276,7 @@ Na podstawie przeprowadzonych eksperymentów wyznaczyliśmy optymalne wartości 
     \item Stagnacja - 30
 \end{enumerate}
 
-\subsection{Zmiany w sekcji: wyznaczanie parametrów drzewa regresyjnego}
+\subsection{Zmiany w sekcji: Wyznaczanie parametrów drzewa regresyjnego}
 
 Sekcja ta została całkowicie przerobiona aby lepiej przedstawić proces wyznaczania optymalnych parametrów drzewa regresyjnego.
 
@@ -316,7 +316,9 @@ Na podstawie ekperymentów, których wyniki zostały przedstawione poniżej, uda
     \item częstotliwość uczenia modelu zastępczego - 16
 \end{enumerate}
 
-Dla wartości większych niż powyższe algorytm zwracał porównywalne wyniki, jednak kosztem większej liczby ewaluacji funkcji celu. Dla wartości mniejszych niż powyższe algortm zwracał gorsze wyniki.
+Dla wyższego procentu ewaluowanych rozwiązań algorytm zwacał porównywalne wyniki, kosztem większej liczby ewaluacji funkcji celu. Dla niższego procentu ewaluowanych rozwiązań algortm zwracał gorsze wyniki.
+
+Im rzadziej algorytm ewaluował model, tym gorsze wyniki zwracał. Dla wartości większych niż 16 algorytm zwracał porównywalne wyniki.
 
 \begin{figure}[H]
     \centering
@@ -340,9 +342,63 @@ Dla wartości większych niż powyższe algorytm zwracał porównywalne wyniki, 
 \end{figure}
 
 
-\subsection{Zmiany w sekcji: model zastępczy}
+\subsection{Zmiany w sekcji: Model zastępczy}
 
 Dodano informacje o historii punktów zewaluowanych.
 
 Historia zewaluowanych punktów nie ma ograniczonego rozmiaru, a dodane do niej punkty nie są usuwane. Zapewnia to pełną informację o przestrzeni przeszukiwań.
+
+Model trenowany jest na początku optymalizacji (zaraz po inicjalizacji populacji i obliczeniu pierwszych wartości fitness), a także co określoną przez parametr liczbę generacji (domyślnie 16), przed selekcją. 
+
+\subsection{Zmiany w sekcji: Porównanie wydajności}
+
+Dodano wykresy funkcji, dla których przeprowadzono testy oraz zaktualizowano wykresy porównujące wyniki algorytmów.
+
+Do testowania algorytmów wykorzystaliśmy dwuwymiarowe funkcje testowe z benchmarku CEC: Shifted Sphere, Shifted Ackley, Shifted Rotated Elliptic oraz Shifted Rotated Griewank. Każda z nich miała optimum globalne wynoszące 0.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{shifted_sphere.png}
+    \caption{Wykres funkcji Shifted Sphere}
+    \label{fig:plot1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{shifted_ackley.png}
+    \caption{Wykres funkcji Shifted Ackley}
+    \label{fig:plot2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{shifted_rotated_elliptic.png}
+    \caption{Wykres funkcji Shifted Rotated Elliptic}
+    \label{fig:plot3}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{shifted_rotated_griewank.png}
+    \caption{Wykres funkcji Shifted Rotated Griewank}
+    \label{fig:plot4}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{comprehensive_results.png}
+    \caption{Porównanie standardowego DE z DE wykorzystującym model zastępczy}
+    \label{fig:comprehensive_results}
+\end{figure}
+
+Dla każdej z funkcji testowych uruchomiliśmy algorytm ewolucji różnicowej standardowej oraz z modelem zastępczym, używając wcześniej wyznaczonych optymalnych parametrów wywołania.
+
+Wykresy przedstawiają wartości uśrednione po 50 powtórzeniach, dla każdej funkcji osobno. W górnym rzędzie znajduje się średnia liczba ewaluacji wykonywanych przez algorytm ewolucji do spełnienia jednego z kryteriów stopu. W środkowym rzędzie przedstawione są najlepsze wartości znalezione przez algorytm w zależności od numeru generacji. W dolnym rzędzie znajduje się informacja o skuteczności, z jaką algorytm odnajdywał optimum globalne w ostatniej generacji. 
+
+W większości przypadków algorytm z modelem zastępczym wykonuje mniej ewaluacji funkcji celu. Jedyną funkcją, dla której otrzymaliśmy inne wyniki, była Shifted Rotated Griewank, w przypadku której standardowa ewolucja o wiele szybciej znajdowała optymalne rozwiązanie, przez co kryterium stopu kończyło wywoływanie algorytmu, ukracając liczbę ewaluacji. Ewolucja z modelem zastępczym z powodu wolniejszego osiągania optymalnych rozwiązań nie spełniała kryterium stagnacji, co powodowało wywoływanie kolejnych ewaluacji. 
+
+Standardowy algorytm ewolucji różnicowej we wszystkich testach szybciej znajdował optymalne rozwiązania.
+Algorytmy dla wszystkich funkcji testowych trafiały w okolice optimum globalnego, jednak standardowy algorytm szybciej otrzymywał dokładniejsze wartości.
+
 \end{document}
+
