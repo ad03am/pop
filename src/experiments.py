@@ -13,12 +13,12 @@ top_percentage = 0.65
 stagnation_generations = 30
 surrogate_update_freq = 16
 
-rounding = 1e-4
+rounding = 1e-6
 
 def run_experiments():
     dim = 2
     bounds = [(-5, 5)] * dim
-    n_runs = 50
+    n_runs = 10
 
     shift = generate_shift_vector(dim, bounds)
     rotation = generate_rotation_matrix(dim)

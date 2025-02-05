@@ -37,9 +37,6 @@ class surrogate_de(differential_evolution):
         self.evaluation_history.append((0, self.evaluations, best_fitness))
 
         self.surrogate.train()
-
-        global_best_solution = best_solution.copy()
-        global_best_fitness = best_fitness
         
         for gen in range(self.max_generations):
             if gen % self.surrogate_update_freq == 0:
@@ -91,11 +88,15 @@ class surrogate_de(differential_evolution):
                             best_solution = trial[i].copy()
                             best_fitness = trial_fitness
             
-            current_best_idx = np.argmin(fitness)
-            if fitness[current_best_idx] < global_best_fitness:
-                global_best_fitness = fitness[current_best_idx]
-                global_best_solution = pop[current_best_idx].copy()
-            
+            if (best_fitness <= self.rounding):
+                print(
+                    f"Evolution worked! {self.rounding} reached."
+                )
+                print(f"Generation: {gen + 1}/{self.max_generations}")
+                if (gen + 1) % 100 != 0:
+                    self.evaluation_history.append((gen + 1, self.evaluations, best_fitness))
+                break
+
             if best_fitness >= last_best_fitness:
                 no_improvement_count += 1
             else:
@@ -103,7 +104,7 @@ class surrogate_de(differential_evolution):
                 no_improvement_count = 0
 
             self.convergence_history.append(np.mean(fitness))
-            self.best_history.append(global_best_fitness)
+            self.best_history.append(best_fitness)
 
             if (gen + 1) % 100 == 0:
                 self.evaluation_history.append((gen + 1, self.evaluations, best_fitness))

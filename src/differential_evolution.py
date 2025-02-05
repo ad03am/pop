@@ -27,6 +27,7 @@ class differential_evolution:
         self.convergence_history = []
         self.best_history = []
         self.evaluation_history = []
+        self.rounding = 1e-6
 
     def evaluate(self, x: np.ndarray):
         self.evaluations += 1
@@ -70,7 +71,7 @@ class differential_evolution:
                 trial = np.copy(population[i])
 
                 for j in range(self.dim):
-                    if np.random.random() < self.CR or j == np.random.randint(self.dim):
+                    if np.random.random() < self.CR:
                         trial[j] = mutant[j]
                     trial[j] = np.clip(trial[j], self.bounds[j, 0], self.bounds[j, 1])
 
@@ -82,6 +83,15 @@ class differential_evolution:
                         best_solution = trial.copy()
                         best_fitness = trial_fitness
                         no_improvement_count = 0
+                    
+            if (best_fitness <= self.rounding):
+                print(
+                    f"Evolution worked! {self.rounding} reached."
+                )
+                print(f"Generation: {generation + 1}/{self.max_generations}")
+                if (generation + 1) % 100 != 0:
+                    self.evaluation_history.append((generation + 1, self.evaluations, best_fitness))
+                break
 
             if best_fitness >= last_best_fitness:
                 no_improvement_count += 1

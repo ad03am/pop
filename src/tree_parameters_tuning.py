@@ -7,14 +7,13 @@ from custom_tree import DecisionTreeRegressor
 from functions import CECFunctions, generate_rotation_matrix, generate_shift_vector
 
 def run_tree_parameter_experiment():
-    max_depth_values = [2, 4, 7, 10]
-    min_samples_split_values = [1, 2, 5, 10]
-    min_samples_leaf_values = [1, 3, 5, 10]
-    top_percentages = [0.05, 0.1, 0.2, 0.4]
+    max_depth_values = [3, 5, 7, 9]
+    min_samples_split_values = [4, 6, 8, 10]
+    min_samples_leaf_values = [2, 5, 8, 11]
     
-    dim = 10
-    bounds = [(-100, 100)] * dim
-    n_runs = 30
+    dim = 2
+    bounds = [(-5, 5)] * dim
+    n_runs = 10
     
     shift = generate_shift_vector(dim, bounds)
     rotation = generate_rotation_matrix(dim)
@@ -22,19 +21,20 @@ def run_tree_parameter_experiment():
     
     results = {}
 
-    for max_depth, min_split, min_leaf, top_perc in product(max_depth_values, min_samples_split_values, min_samples_leaf_values, top_percentages):
-        key = (max_depth, min_split, min_leaf, top_perc)
+    for max_depth, min_split, min_leaf in product(max_depth_values, min_samples_split_values, min_samples_leaf_values):
+        key = (max_depth, min_split, min_leaf)
         results[key] = []
-        print(f"Testing max_depth={max_depth}, min_samples_split={min_split}, min_samples_leaf={min_leaf}, top_percentage={top_perc}")
+        print(f"Testing max_depth={max_depth}, min_samples_split={min_split}, min_samples_leaf={min_leaf}")
 
         for run in range(n_runs):
             print(f"Run {run + 1}/{n_runs}")
             
-            de = surrogate_de(test_func, bounds, top_percentage=top_perc)
+            de = surrogate_de(test_func, bounds, top_percentage=0.3)
             de.surrogate.model = DecisionTreeRegressor(
                 max_depth=max_depth,
                 min_samples_split=min_split,
-                min_samples_leaf=min_leaf
+                min_samples_leaf=min_leaf,
+                max_generations=500
             )
             
             _, fitness = de.optimize()

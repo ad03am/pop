@@ -51,7 +51,6 @@ class DecisionTreeRegressor:
             
         y_squared = y ** 2
         total_sum = np.sum(y)
-        total_sum_squared = total_sum ** 2
         total_squared_sum = np.sum(y_squared)
         n_samples = len(y)
         
