@@ -28,6 +28,7 @@ class differential_evolution:
         self.best_history = []
         self.evaluation_history = []
         self.rounding = 1e-6
+        self.fiteva = {} # fitness on evaluations xd 
 
     def evaluate(self, x: np.ndarray):
         self.evaluations += 1
@@ -83,15 +84,6 @@ class differential_evolution:
                         best_solution = trial.copy()
                         best_fitness = trial_fitness
                         no_improvement_count = 0
-                    
-            if (best_fitness <= self.rounding):
-                print(
-                    f"Evolution worked! {self.rounding} reached."
-                )
-                print(f"Generation: {generation + 1}/{self.max_generations}")
-                if (generation + 1) % 100 != 0:
-                    self.evaluation_history.append((generation + 1, self.evaluations, best_fitness))
-                break
 
             if best_fitness >= last_best_fitness:
                 no_improvement_count += 1
@@ -105,6 +97,16 @@ class differential_evolution:
             if (generation + 1) % 100 == 0:
                 self.evaluation_history.append((generation + 1, self.evaluations, best_fitness))
 
+            self.fiteva[self.evaluations] = best_fitness
+
+            if (best_fitness <= self.rounding):
+                print(
+                    f"Evolution worked! {self.rounding} reached."
+                )
+                print(f"Generation: {generation + 1}/{self.max_generations}")
+                if (generation + 1) % 100 != 0:
+                    self.evaluation_history.append((generation + 1, self.evaluations, best_fitness))
+                break
 
             if no_improvement_count >= self.stagnation_generations:
                 print(

@@ -87,15 +87,6 @@ class surrogate_de(differential_evolution):
                         if trial_fitness < best_fitness:
                             best_solution = trial[i].copy()
                             best_fitness = trial_fitness
-            
-            if (best_fitness <= self.rounding):
-                print(
-                    f"Evolution worked! {self.rounding} reached."
-                )
-                print(f"Generation: {gen + 1}/{self.max_generations}")
-                if (gen + 1) % 100 != 0:
-                    self.evaluation_history.append((gen + 1, self.evaluations, best_fitness))
-                break
 
             if best_fitness >= last_best_fitness:
                 no_improvement_count += 1
@@ -108,6 +99,17 @@ class surrogate_de(differential_evolution):
 
             if (gen + 1) % 100 == 0:
                 self.evaluation_history.append((gen + 1, self.evaluations, best_fitness))
+
+            self.fiteva[self.evaluations] = best_fitness
+            
+            if (best_fitness <= self.rounding):
+                print(
+                    f"Evolution worked! {self.rounding} reached."
+                )
+                print(f"Generation: {gen + 1}/{self.max_generations}")
+                if (gen + 1) % 100 != 0:
+                    self.evaluation_history.append((gen + 1, self.evaluations, best_fitness))
+                break
 
             if no_improvement_count >= self.stagnation_generations:
                 print(f"Stopped because of stagnation for {self.stagnation_generations} generations")

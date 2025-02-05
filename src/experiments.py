@@ -136,6 +136,8 @@ def run_experiments():
         std_conv = np.full(max_generations, np.nan)
         sur_conv = np.full(max_generations, np.nan)
 
+        # max_eval = max(np.asarray([list(dic.keys()) for dic in (standard_convergence + surrogate_convergence)], dtype=int).flatten)
+
         for gen in range(max_generations):
             valid_std = [hist[gen] for hist in standard_convergence if gen < len(hist)]
             valid_sur = [hist[gen] for hist in surrogate_convergence if gen < len(hist)]
