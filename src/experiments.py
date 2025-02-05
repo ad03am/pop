@@ -206,20 +206,63 @@ def plot_results(results, all_algorithm_objects, test_functions, all_evaluations
             std_fiteva = all_algorithm_objects[func_name]["standard"][run].fiteva
             sur_fiteva = all_algorithm_objects[func_name]["surrogate"][run].fiteva
             
+            std_stop_eval = None
+            sur_stop_eval = None
+            
             for evals, fitness in sorted(std_fiteva.items()):
                 if np.abs(fitness - test_functions[func_name][2]) < rounding:
+                    std_stop_eval = evals
                     evaluations_to_optimum["Standard DE"].append(evals)
                     break
             else:
                 evaluations_to_optimum["Standard DE"].append(max(std_fiteva.keys()))
+                std_stop_eval = max(std_fiteva.keys())
             
             for evals, fitness in sorted(sur_fiteva.items()):
                 if np.abs(fitness - test_functions[func_name][2]) < rounding:
+                    sur_stop_eval = evals
                     evaluations_to_optimum["Surrogate DE"].append(evals)
                     break
             else:
                 evaluations_to_optimum["Surrogate DE"].append(max(sur_fiteva.keys()))
+                sur_stop_eval = max(sur_fiteva.keys())
 
+            std_fiteva = sorted(std_fiteva.items())
+            sur_fiteva = sorted(sur_fiteva.items())
+            
+            std_evals = [x[0] for x in std_fiteva if x[0] <= std_stop_eval]
+            std_fits = [x[1] for x in std_fiteva if x[0] <= std_stop_eval]
+            
+            sur_evals = [x[0] for x in sur_fiteva if x[0] <= sur_stop_eval]
+            sur_fits = [x[1] for x in sur_fiteva if x[0] <= sur_stop_eval]
+            
+            eval_points = np.linspace(0, max(max(std_evals), max(sur_evals)), 100)
+            std_interpolated = np.interp(eval_points, std_evals, std_fits)
+            sur_interpolated = np.interp(eval_points, sur_evals, sur_fits)
+            
+            std_mask = eval_points <= std_stop_eval
+            sur_mask = eval_points <= sur_stop_eval
+            
+            std_final = np.full_like(eval_points, np.nan, dtype=float)
+            sur_final = np.full_like(eval_points, np.nan, dtype=float)
+            
+            std_final[std_mask] = std_interpolated[std_mask]
+            sur_final[sur_mask] = sur_interpolated[sur_mask]
+            
+            if run == 0:
+                avg_fitness_std = std_final
+                avg_fitness_sur = sur_final
+                count_std = np.ones_like(eval_points)
+                count_sur = np.ones_like(eval_points)
+            else:
+                mask_std = ~np.isnan(std_final)
+                mask_sur = ~np.isnan(sur_final)
+                
+                avg_fitness_std[mask_std] += std_final[mask_std]
+                avg_fitness_sur[mask_sur] += sur_final[mask_sur]
+                count_std[mask_std] += 1
+                count_sur[mask_sur] += 1
+        
         means = [np.mean(evaluations_to_optimum["Standard DE"]), 
                 np.mean(evaluations_to_optimum["Surrogate DE"])]
         stds = [np.std(evaluations_to_optimum["Standard DE"]), 
@@ -232,31 +275,8 @@ def plot_results(results, all_algorithm_objects, test_functions, all_evaluations
         axes[0, i].set_title(f"{func_name}\nEvaluations to Reach Optimum")
         axes[0, i].set_ylabel("Number of Evaluations")
 
-        max_evals = max(
-            max(max(x.fiteva.keys()) for x in all_algorithm_objects[func_name]["standard"]),
-            max(max(x.fiteva.keys()) for x in all_algorithm_objects[func_name]["surrogate"])
-        )
-        eval_points = np.linspace(0, max_evals, 100)
-        
-        avg_fitness_std = np.zeros(len(eval_points))
-        avg_fitness_sur = np.zeros(len(eval_points))
-        
-        for run in range(len(all_algorithm_objects[func_name]["standard"])):
-            std_fiteva = sorted(all_algorithm_objects[func_name]["standard"][run].fiteva.items())
-            sur_fiteva = sorted(all_algorithm_objects[func_name]["surrogate"][run].fiteva.items())
-            
-            std_evals = [x[0] for x in std_fiteva]
-            std_fits = [x[1] for x in std_fiteva]
-            interp_std = np.interp(eval_points, std_evals, std_fits)
-            avg_fitness_std += interp_std
-            
-            sur_evals = [x[0] for x in sur_fiteva]
-            sur_fits = [x[1] for x in sur_fiteva]
-            interp_sur = np.interp(eval_points, sur_evals, sur_fits)
-            avg_fitness_sur += interp_sur
-        
-        avg_fitness_std /= len(all_algorithm_objects[func_name]["standard"])
-        avg_fitness_sur /= len(all_algorithm_objects[func_name]["surrogate"])
+        avg_fitness_std = np.divide(avg_fitness_std, count_std, where=count_std>0, out=np.full_like(avg_fitness_std, np.nan))
+        avg_fitness_sur = np.divide(avg_fitness_sur, count_sur, where=count_sur>0, out=np.full_like(avg_fitness_sur, np.nan))
 
         axes[1, i].plot(eval_points, avg_fitness_std, label="Standard DE", color=colors[0], alpha=0.8)
         axes[1, i].plot(eval_points, avg_fitness_sur, label="Surrogate DE", color=colors[1], alpha=0.8)
